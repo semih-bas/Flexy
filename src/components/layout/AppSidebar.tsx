@@ -57,38 +57,36 @@ const navItems: NavItem[] = [
 export default function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const closeSidebar = () => setIsOpen(false);
+
   return (
     <>
       <button
         type="button"
-        onClick={() => setIsOpen((value) => !value)}
-        className="fixed left-4 top-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#0d1426]/95 text-slate-100 shadow-lg shadow-black/30 backdrop-blur md:hidden"
-        aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
+        onClick={() => setIsOpen(true)}
+        className={`fixed left-4 top-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#0d1426]/95 text-slate-100 shadow-lg shadow-black/30 backdrop-blur transition-opacity duration-300 ${
+          isOpen ? 'pointer-events-none opacity-0' : 'opacity-100'
+        }`}
+        aria-label="Open sidebar"
       >
-        {isOpen ? (
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
-          </svg>
-        ) : (
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-          </svg>
-        )}
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+        </svg>
       </button>
 
-      {isOpen ? (
-        <button
-          type="button"
-          aria-label="Close sidebar backdrop"
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm md:hidden"
-        />
-      ) : null}
+      <button
+        type="button"
+        aria-label="Close sidebar backdrop"
+        onClick={closeSidebar}
+        className={`fixed inset-0 z-30 bg-slate-950/70 backdrop-blur-sm transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+      />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 max-w-[84vw] flex-col justify-between border-r border-white/10 bg-[#060816] p-5 text-slate-100 shadow-[0_0_60px_rgba(0,0,0,0.35)] transition-transform duration-300 md:static md:h-full md:w-72 md:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 max-w-[84vw] flex-col justify-between border-r border-white/10 bg-[#060816]/95 p-5 text-slate-100 shadow-[0_0_80px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-transform duration-300 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
       >
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -101,6 +99,17 @@ export default function AppSidebar() {
                 <h2 className="text-base font-semibold text-white">Training Hub</h2>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={closeSidebar}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:bg-white/10"
+              aria-label="Close sidebar"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
+              </svg>
+            </button>
           </div>
 
           <nav className="space-y-1.5">
