@@ -8,7 +8,7 @@ const todayExercises = [
 
 export default function HeroSection() {
   return (
-    <section className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
+    <section className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 md:py-20 lg:px-8">
       <div>
         <p className="mb-4 inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300">
           Mobile-first workout planner
@@ -31,7 +31,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <div className="relative mx-auto w-full max-w-sm">
+      <div id="mobile" className="relative mx-auto w-full max-w-sm">
         <div className="absolute inset-0 rounded-[3rem] bg-cyan-400/20 blur-3xl" />
 
         <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#10131b] p-4 shadow-2xl">
@@ -52,9 +52,7 @@ export default function HeroSection() {
                 key={exercise}
                 className="flex items-center justify-between rounded-2xl bg-white/5 p-4"
               >
-                <span className="text-sm font-medium text-white">
-                  {exercise}
-                </span>
+                <span className="text-sm font-medium text-white">{exercise}</span>
                 <span className="text-xs text-zinc-400">4 sets</span>
               </div>
             ))}
