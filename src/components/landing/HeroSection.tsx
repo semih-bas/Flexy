@@ -8,9 +8,10 @@ const todayExercises = [
 
 export default function HeroSection() {
   return (
-    <section className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 md:py-20 lg:px-8">
+    <section className="bg-[#05060a] text-white">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 md:py-20 lg:px-8">
       <div>
-        <p className="mb-4 inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300">
+        <p className="mb-4 inline-flex rounded-full border border-brand/30 bg-brand/10 px-4 py-2 text-sm text-brand">
           Mobile-first workout planner
         </p>
 
@@ -32,7 +33,7 @@ export default function HeroSection() {
       </div>
 
       <div id="mobile" className="relative mx-auto w-full max-w-sm">
-        <div className="absolute inset-0 rounded-[3rem] bg-cyan-400/20 blur-3xl" />
+        <div className="absolute inset-0 rounded-[3rem] bg-brand/25 blur-3xl" />
 
         <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#10131b] p-4 shadow-2xl">
           <div className="mb-5 flex items-center justify-between">
@@ -41,7 +42,7 @@ export default function HeroSection() {
               <h2 className="text-2xl font-semibold text-white">Push Day</h2>
             </div>
 
-            <span className="rounded-full bg-cyan-400 px-3 py-1 text-xs font-semibold text-black">
+            <span className="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white">
               Active
             </span>
           </div>
@@ -58,13 +59,14 @@ export default function HeroSection() {
             ))}
           </div>
 
-          <div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4">
-            <p className="text-sm font-medium text-cyan-300">Next exercise</p>
+          <div className="mt-5 rounded-2xl border border-brand/25 bg-brand/10 p-4">
+            <p className="text-sm font-medium text-brand">Next exercise</p>
             <p className="mt-1 text-sm text-zinc-300">
               Keep your workout simple and focused.
             </p>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

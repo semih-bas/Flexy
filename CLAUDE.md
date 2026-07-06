@@ -42,10 +42,13 @@ Mevcut koyu tema TERK EDİLECEK. Hedef, eski tasarımın hissi:
 - Erişilebilirlik: etkileşimli öğelere aria-label, semantik HTML.
 
 ## YOL HARİTASI (sıra önemli)
-1. Temizlik: layout.tsx metadata, AppSidebar'daki ölü "active" alanı, public'teki şablon svg'leri
-2. Tema geçişi: @theme token'ları + açık tema (sayfa sayfa)
-3. Exercise Library'ye çalışan arama + kategori filtresi
-4. /exercises/[id] detay sayfası
-5. Haftalık plan state'i ve Add Workout akışı
-6. Templates sayfası (legacy'deki şablonlar TypeScript'e taşınacak)
-7. Faz 3: kendi API + veritabanı
+1. Tema geçişi (tüm sayfalar token'lara geçecek)
+2. Dashboard tasarım inceltmesi (eski tasarım referans)
+3. Exercise Library: tasarım + çalışan arama ve kategori filtresi
+4. Egzersiz detay sayfası /exercises/[id]
+5. Dashboard işleyişi: Add Workout akışı, Today paneli, tamamlama işaretleri
+6. Templates sayfası (route açılacak, eski şablonlar taşınacak)
+7. My Plans: favori plan kaydetme/uygulama
+8. Settings sayfası (basit)
+9. Landing yeniden tasarım (en son)
+10. Backend: veritabanı + API + auth

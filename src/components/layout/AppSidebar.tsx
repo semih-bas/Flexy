@@ -71,7 +71,7 @@ export default function AppSidebar() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className={`fixed left-4 top-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#0d1426]/95 text-slate-100 shadow-lg shadow-black/30 backdrop-blur transition-opacity duration-300 ${
+        className={`fixed left-4 top-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-foreground-muted/15 bg-surface text-foreground shadow-lg backdrop-blur transition-opacity duration-300 ${
           isOpen ? 'pointer-events-none opacity-0' : 'opacity-100'
         }`}
         aria-label="Open sidebar"
@@ -85,32 +85,32 @@ export default function AppSidebar() {
         type="button"
         aria-label="Close sidebar backdrop"
         onClick={closeSidebar}
-        className={`fixed inset-0 z-30 bg-slate-950/70 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-30 bg-foreground/60 backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 max-w-[84vw] flex-col justify-between border-r border-white/10 bg-[#060816]/95 p-5 text-slate-100 shadow-[0_0_80px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-transform duration-300 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 max-w-[84vw] flex-col justify-between border-r border-foreground-muted/10 bg-surface p-5 text-foreground shadow-2xl backdrop-blur-xl transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
       >
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600 shadow-lg shadow-cyan-500/20">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand shadow-lg shadow-brand/20">
                 <span className="text-lg font-semibold tracking-[0.2em] text-white">F</span>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Flexy</p>
-                <h2 className="text-base font-semibold text-white">Training Hub</h2>
+                <p className="text-xs uppercase tracking-[0.35em] text-foreground-muted">Flexy</p>
+                <h2 className="text-base font-semibold text-foreground">Training Hub</h2>
               </div>
             </div>
 
             <button
               type="button"
               onClick={closeSidebar}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:bg-white/10"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-foreground-muted/15 bg-foreground/5 text-foreground transition hover:bg-foreground/10"
               aria-label="Close sidebar"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -130,11 +130,11 @@ export default function AppSidebar() {
                   onClick={closeSidebar}
                   className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-medium transition ${
                     isActive
-                      ? 'bg-gradient-to-r from-cyan-500/20 to-sky-500/10 text-white shadow-inner shadow-cyan-500/10'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                      ? 'bg-brand/10 text-brand'
+                      : 'text-foreground-muted hover:bg-foreground/5 hover:text-foreground'
                   }`}
                 >
-                  <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${isActive ? 'bg-cyan-500/15 text-cyan-300' : 'bg-white/5 text-slate-400'}`}>
+                  <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${isActive ? 'bg-brand/15 text-brand' : 'bg-foreground/5 text-foreground-muted'}`}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
@@ -144,16 +144,16 @@ export default function AppSidebar() {
           </nav>
         </div>
 
-        <div className="mt-6 rounded-[24px] border border-white/10 bg-gradient-to-br from-slate-900/90 to-slate-800/80 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-          <div className="mb-3 inline-flex rounded-full border border-cyan-400/20 bg-cyan-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-cyan-300">
+        <div className="mt-6 rounded-[24px] border border-foreground-muted/10 bg-background p-4">
+          <div className="mb-3 inline-flex rounded-full border border-brand/20 bg-brand/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-brand">
             Flexy v2.0
           </div>
-          <p className="text-sm leading-6 text-slate-300">
+          <p className="text-sm leading-6 text-foreground-muted">
             Weekly workout planning and tracking application
           </p>
           <button
             type="button"
-            className="mt-4 w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15"
+            className="mt-4 w-full rounded-2xl border border-foreground-muted/15 bg-foreground/5 px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-foreground/10"
           >
             Logout
           </button>
