@@ -13,6 +13,7 @@ export default function DashboardPage() {
           <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand">
             Dashboard
           </p>
+          {/* TODO: Faz 3'te auth eklenince mock isim yerine gerçek kullanıcı adı gelecek. */}
           <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             Welcome back, Semih Baş
           </h1>
