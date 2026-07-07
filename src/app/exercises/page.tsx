@@ -1,5 +1,5 @@
 import AppSidebar from '@/components/layout/AppSidebar';
-import ExerciseCard from '@/components/exercises/ExerciseCard';
+import ExerciseExplorer from '@/components/exercises/ExerciseExplorer';
 import { exerciseCategories, exercises } from '@/data/exercises';
 
 export default function ExercisesPage() {
@@ -28,38 +28,8 @@ export default function ExercisesPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col gap-4 rounded-[1.6rem] border border-foreground-muted/10 bg-background p-4 lg:flex-row lg:items-center lg:justify-between lg:p-5">
-          <label className="flex flex-1 items-center gap-3 rounded-2xl border border-foreground-muted/15 bg-surface px-4 py-3 text-sm text-foreground-muted">
-            <svg viewBox="0 0 24 24" className="h-5 w-5 text-foreground-muted" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <circle cx="11" cy="11" r="6" />
-              <path d="m20 20-4.2-4.2" strokeLinecap="round" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search exercises"
-              className="w-full bg-transparent outline-none placeholder:text-foreground-muted"
-            />
-          </label>
-
-          <div className="flex flex-wrap gap-2">
-            {exerciseCategories.map((category) => (
-              <button
-                key={category}
-                type="button"
-                className="rounded-full border border-foreground-muted/15 bg-surface px-3 py-2 text-sm text-foreground-muted transition hover:border-brand/40 hover:text-foreground"
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+          <ExerciseExplorer exercises={exercises} categories={exerciseCategories} />
         </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4 lg:grid-cols-2">
-          {exercises.map((exercise) => (
-            <ExerciseCard key={exercise.id} exercise={exercise} />
-          ))}
-        </div>
-      </div>
       </section>
     </main>
   );

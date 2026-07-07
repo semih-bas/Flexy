@@ -1,42 +1,66 @@
+import Image from 'next/image';
 import type { Exercise } from '@/data/exercises';
+import { surfaceGlowSoft } from '@/lib/surfaceStyles';
 
 type ExerciseCardProps = {
   exercise: Exercise;
 };
 
+// Bu kart tıklanabilir değil: detay sayfası (/exercises/[id]) yol haritasında sonraki adım.
+// O sayfa açılana kadar View butonu düz button kalır (Link'e bağlanmaz).
 export default function ExerciseCard({ exercise }: ExerciseCardProps) {
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-foreground-muted/10 bg-surface shadow-lg">
-      <div className="flex h-40 items-center justify-center border-b border-foreground-muted/10 bg-brand/5">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-brand/15 bg-brand/10 text-sm font-semibold uppercase tracking-[0.25em] text-brand">
-          {exercise.category.slice(0, 2)}
-        </div>
+    <article className={`flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised ${surfaceGlowSoft}`}>
+      <div className="relative aspect-[4/3] w-full shrink-0 bg-background">
+        {exercise.image ? (
+          <Image
+            src={exercise.image}
+            alt={exercise.name}
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-raised to-background">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-10 w-10 text-brand/30"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path
+                d="M5 9v6M3 10v4M19 9v6M21 10v4M7 12h10"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <rect x="5" y="7" width="2.4" height="10" rx="1" />
+              <rect x="16.6" y="7" width="2.4" height="10" rx="1" />
+            </svg>
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <div className="flex items-center justify-between gap-3">
-          <span className="rounded-full border border-brand/20 bg-brand/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-brand">
-            {exercise.category}
-          </span>
-          <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-foreground-muted">
-            {exercise.level}
-          </span>
-        </div>
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <span className="inline-flex w-fit items-center rounded-full bg-background px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand">
+          {exercise.category}
+        </span>
 
-        <h3 className="mt-3 text-lg font-semibold text-foreground">{exercise.name}</h3>
+        <h3 className="text-base font-bold leading-tight text-foreground">{exercise.name}</h3>
 
-        <div className="mt-2 flex items-center gap-2 text-sm text-foreground-muted">
-          <span>{exercise.equipment}</span>
-          <span className="text-foreground-muted/60">•</span>
+        <div className="mt-auto flex items-center justify-between border-t border-border pt-3 text-xs font-semibold text-foreground-muted">
           <span>{exercise.type}</span>
+          <span>
+            {exercise.defaultSets}x{exercise.defaultReps}
+          </span>
         </div>
 
-        <div className="mt-4 flex items-center justify-between rounded-2xl border border-foreground-muted/10 bg-background px-3 py-2 text-sm text-foreground-muted">
-          <span className="truncate">{exercise.primaryMuscles[0]}</span>
-          <button type="button" className="ml-2 shrink-0 rounded-full border border-foreground-muted/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted transition hover:border-brand/40 hover:text-foreground">
-            View
-          </button>
-        </div>
+        <button
+          type="button"
+          className="w-full rounded-xl border border-border py-2 text-sm font-semibold text-foreground-muted transition hover:border-brand/60 hover:text-brand"
+        >
+          View
+        </button>
       </div>
     </article>
   );

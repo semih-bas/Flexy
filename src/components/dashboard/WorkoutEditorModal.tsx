@@ -79,7 +79,17 @@ type WorkoutEditorModalProps = {
 export default function WorkoutEditorModal({ day, onClose, onSave, onDelete }: WorkoutEditorModalProps) {
   const isEditMode = day.workoutName !== null;
 
-  const [selectedCategories, setSelectedCategories] = useState<ExerciseCategory[]>([]);
+  // Edit modunda sol paneldeki kas grubu seçimleri, günün mevcut egzersizlerindeki muscleGroup
+  // değerlerinden türetilir (böylece kayıtlı bir workout açılınca ilgili gruplar zaten seçili gelir).
+  const [selectedCategories, setSelectedCategories] = useState<ExerciseCategory[]>(() => {
+    const groups = new Set<ExerciseCategory>();
+    for (const exercise of day.exercises) {
+      if (exercise.muscleGroup && (exerciseCategories as string[]).includes(exercise.muscleGroup)) {
+        groups.add(exercise.muscleGroup as ExerciseCategory);
+      }
+    }
+    return Array.from(groups);
+  });
   const [search, setSearch] = useState("");
   const [session, setSession] = useState<SessionExercise[]>(() =>
     day.exercises.map((exercise) => {
@@ -321,14 +331,14 @@ export default function WorkoutEditorModal({ day, onClose, onSave, onDelete }: W
           </div>
 
           {/* SAĞ SÜTUN — Your Session */}
-          <div className="themed-scrollbar flex min-h-0 flex-col p-5 md:overflow-y-auto">
+          <div className="themed-scrollbar flex min-h-0 flex-col items-stretch justify-start p-5 md:overflow-y-auto">
             <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand">Your Session</p>
 
             {session.length === 0 ? (
               <p className="mt-6 text-center text-sm text-foreground-muted">No exercises selected yet.</p>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSessionDragEnd}>
-                <div className="mt-3 min-h-0 flex-1 space-y-4">
+                <div className="mt-3 flex min-h-0 flex-1 flex-col items-stretch justify-start space-y-4">
                   {groups.map((group, index) => (
                     <div key={group.muscleGroup}>
                       <p

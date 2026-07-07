@@ -13,6 +13,7 @@ import {
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { DayPlan, PlanExercise } from "@/data/mockPlan";
 import { getMuscleGroupColor } from "@/lib/muscleGroupColor";
+import { surfaceGlow, surfaceGlowSoft } from "@/lib/surfaceStyles";
 import WorkoutEditorModal from "./WorkoutEditorModal";
 import SortableRow from "./SortableRow";
 
@@ -40,13 +41,6 @@ const statusBadgeLabel: Record<DayStatus, string> = {
   partial: "Partial",
   missed: "Missed",
 };
-
-// Tek yerde tanımlı "yumuşak yüzey" dokusu: üstten çok hafif ışıma + hayalet kenarlık + yumuşak gölge.
-// Kenarlık rengi kullanım yerinde verilir (seçili/today kartı turuncu vurgu alabildiği için).
-const surfaceGlow =
-  "border bg-gradient-to-b from-foreground/[0.05] to-transparent shadow-xl shadow-black/30";
-const surfaceGlowSoft =
-  "border border-foreground/10 bg-gradient-to-b from-foreground/[0.04] to-transparent shadow-lg shadow-black/20";
 
 // completedCount/status veride tutulmaz: exercises'tan hesaplanır (türetilebilen veri saklanmaz).
 function getCounts(day: DayPlan) {
