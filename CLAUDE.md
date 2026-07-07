@@ -23,16 +23,22 @@ aşamasında. Bu projenin asıl amacı ürün kadar öğrenme.
 6. `.env`, `node_modules`, `.next`, `legacy-reference/` dosyalarına dokunma.
 
 ## TASARIM SİSTEMİ (eski Flexy'nin dili, bir tık rafine)
-Mevcut koyu tema TERK EDİLECEK. Hedef, eski tasarımın hissi:
-- Zemin: açık, sıcak krem (#F7F4EF civarı) — koyu değil
-- Kartlar: beyaz, yumuşak büyük köşe yarıçapı (rounded-2xl/3xl), hafif gölge
-- Ana renk: turuncu (#F97316 / orange-500 ailesi) — butonlar, aktif durumlar, vurgular
-- Metin: koyu lacivert/slate (#1E293B civarı), ikincil metin slate-500
-- His: ferah, temiz, sıcak; mobile-first (uygulama ileride mobil mağazalara çıkacak)
-- Landing hero koyu görsel üzerine açık metin kalabilir (eski tasarımdaki gibi)
-- Renkler tek tek class'lara gömülmez; `globals.css` içinde Tailwind 4 `@theme`
-  bloğunda token olarak tanımlanır (--color-brand vb.) ve oradan kullanılır.
-- Yeni AppSidebar'ın açılıp kapanma davranışı KORUNACAK, renkleri yeni temaya uyarlanacak.
+Tema koyu — legacy-reference'taki eski tasarımın diline dönüş, bir tık rafine:
+- Zemin: çok koyu lacivert-siyah (#05060a–#0b0f16 arası)
+- Kart yüzeyleri: zeminden bir ton açık koyu (#10151d civarı), yumuşak büyük
+  köşe yarıçapı (rounded-2xl/3xl)
+- Ana renk: turuncu (#F97316) — butonlar, aktif durumlar, gün etiketleri
+- Ana metin açık (#F1F5F9 civarı); ikincil metin slate-400 civarı ama koyu
+  zeminde HER ZAMAN okunur kontrastta olacak şekilde ayarlanır — soluk/okunmaz
+  gri hatası tekrarlanmayacak
+- Set/tekrar rozetleri: nötr koyu gri (eski mavi/camgöbeği rozetler kullanılmıyor)
+- Durum rozetleri: Completed → yeşil, Partial → nötr, Today → turuncu dolgu
+- His: premium, sakin, koyu; mobile-first (uygulama ileride mobil mağazalara çıkacak)
+- İleride açık tema seçeneği eklenebilir ihtimaline karşı TÜM renkler token
+  üzerinden tanımlanır; renkler asla elle hex olarak class'lara yazılmaz
+- Renkler `globals.css` içinde Tailwind 4 `@theme` bloğunda token olarak
+  tanımlanır (--color-brand vb.) ve oradan kullanılır
+- AppSidebar'ın açılıp kapanma davranışı KORUNACAK, renkleri koyu temaya uyarlı.
 
 ## KOD KURALLARI
 - Varsayılan server component; `'use client'` sadece state/etkileşim gerektiğinde.
