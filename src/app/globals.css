@@ -21,3 +21,27 @@ body {
   color: var(--color-foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Koyu temaya uyan scrollbar: tarayıcının varsayılan beyaz scrollbar'ı yerine kullanılır. */
+.themed-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.themed-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.themed-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.themed-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 999px;
+}
+
+.themed-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-foreground-muted);
+}

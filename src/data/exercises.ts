@@ -13,6 +13,8 @@ export type Exercise = {
   type: ExerciseType;
   description: string;
   tips: string[];
+  defaultSets: number;
+  defaultReps: string;
 };
 
 export const exerciseCategories: ExerciseCategory[] = [
@@ -38,6 +40,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A classic bodyweight movement that builds upper-body strength and stability.',
     tips: ['Keep your body in a straight line.', 'Lower until your chest nearly touches the floor.'],
+    defaultSets: 3,
+    defaultReps: '12-15',
   },
   {
     id: 'bench-press',
@@ -50,6 +54,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A staple compound lift for pressing strength and chest size.',
     tips: ['Keep your feet planted.', 'Control the lowering phase to protect your shoulders.'],
+    defaultSets: 4,
+    defaultReps: '8-10',
   },
   {
     id: 'incline-dumbbell-press',
@@ -62,6 +68,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Targets the upper chest with a comfortable pressing angle.',
     tips: ['Use a slight incline that feels controlled.', 'Avoid flaring the elbows excessively.'],
+    defaultSets: 3,
+    defaultReps: '10-12',
   },
   {
     id: 'lat-pulldown',
@@ -74,6 +82,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A controlled vertical pull that strengthens the back and posture.',
     tips: ['Pull the bar toward your upper chest.', 'Keep your torso steady.'],
+    defaultSets: 3,
+    defaultReps: '10-12',
   },
   {
     id: 'bent-over-row',
@@ -86,6 +96,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Builds back thickness and overall pulling strength.',
     tips: ['Brace your core before each rep.', 'Keep your spine neutral.'],
+    defaultSets: 4,
+    defaultReps: '8-10',
   },
   {
     id: 'seated-cable-row',
@@ -98,6 +110,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A reliable row variation for upper-back development and posture.',
     tips: ['Pull your elbows back rather than shrugging.', 'Pause briefly at the end of the movement.'],
+    defaultSets: 3,
+    defaultReps: '10-12',
   },
   {
     id: 'overhead-press',
@@ -110,6 +124,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Develops shoulder strength and overhead stability.',
     tips: ['Brace your abs hard.', 'Press the bar overhead without arching too much.'],
+    defaultSets: 4,
+    defaultReps: '8-10',
   },
   {
     id: 'lateral-raise',
@@ -122,6 +138,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Targets the side delts for broader shoulder shape.',
     tips: ['Lift with a slight bend in the elbows.', 'Avoid using momentum.'],
+    defaultSets: 3,
+    defaultReps: '12-15',
   },
   {
     id: 'front-raise',
@@ -134,6 +152,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Isolates the front of the shoulders with a simple movement.',
     tips: ['Raise to shoulder height.', 'Move slowly and stay controlled.'],
+    defaultSets: 3,
+    defaultReps: '12-15',
   },
   {
     id: 'barbell-curl',
@@ -146,6 +166,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A classic biceps builder for arm size and strength.',
     tips: ['Keep elbows close to your body.', 'Avoid swinging at the bottom.'],
+    defaultSets: 3,
+    defaultReps: '10-12',
   },
   {
     id: 'hammer-curl',
@@ -158,6 +180,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Builds arm strength while emphasizing the brachialis.',
     tips: ['Keep the wrists neutral.', 'Use a full range of motion.'],
+    defaultSets: 3,
+    defaultReps: '12-15',
   },
   {
     id: 'preacher-curl',
@@ -170,6 +194,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Great for isolating the biceps with less body swing.',
     tips: ['Keep your upper arms on the pad.', 'Lower under control.'],
+    defaultSets: 3,
+    defaultReps: '10-12',
   },
   {
     id: 'tricep-dip',
@@ -182,6 +208,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A powerful bodyweight movement for triceps and pressing strength.',
     tips: ['Keep your shoulders down.', 'Go only as deep as your knees and shoulders allow.'],
+    defaultSets: 3,
+    defaultReps: 'AMRAP',
   },
   {
     id: 'skull-crusher',
@@ -194,6 +222,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A focused isolation movement for the triceps.',
     tips: ['Keep your elbows fixed in place.', 'Lower the weight slowly.'],
+    defaultSets: 3,
+    defaultReps: '10-12',
   },
   {
     id: 'rope-pushdown',
@@ -206,6 +236,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A simple cable exercise for triceps endurance and shape.',
     tips: ['Keep your elbows tucked.', 'Squeeze at the bottom.'],
+    defaultSets: 3,
+    defaultReps: '12-15',
   },
   {
     id: 'squat',
@@ -218,6 +250,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A foundational lower-body lift for strength and size.',
     tips: ['Brace your core before descending.', 'Drive through your whole foot.'],
+    defaultSets: 4,
+    defaultReps: '6-8',
   },
   {
     id: 'romanian-deadlift',
@@ -230,6 +264,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Great for hamstring strength and posterior-chain development.',
     tips: ['Keep your knees soft and your back flat.', 'Feel the stretch in your hamstrings.'],
+    defaultSets: 4,
+    defaultReps: '8-10',
   },
   {
     id: 'walking-lunge',
@@ -242,6 +278,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Improves balance, leg strength, and coordination.',
     tips: ['Take long controlled steps.', 'Keep your torso upright.'],
+    defaultSets: 3,
+    defaultReps: '10-12 per leg',
   },
   {
     id: 'plank',
@@ -254,6 +292,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'Builds core stability and full-body tension.',
     tips: ['Keep your ribs down.', 'Avoid letting your hips sag.'],
+    defaultSets: 3,
+    defaultReps: '30-45 sec',
   },
   {
     id: 'dead-bug',
@@ -266,6 +306,8 @@ export const exercises: Exercise[] = [
     type: 'Mobility',
     description: 'Improves core control and helps protect the lower back.',
     tips: ['Move slowly and keep your lower back pressed down.', 'Maintain control throughout.'],
+    defaultSets: 3,
+    defaultReps: '10-12 per side',
   },
   {
     id: 'hollow-hold',
@@ -278,6 +320,8 @@ export const exercises: Exercise[] = [
     type: 'Strength',
     description: 'A compact core drill for abdominal strength and body tension.',
     tips: ['Keep your lower back rounded slightly.', 'Hold the shape with control.'],
+    defaultSets: 3,
+    defaultReps: '20-30 sec',
   },
   {
     id: 'jump-rope',
@@ -290,6 +334,8 @@ export const exercises: Exercise[] = [
     type: 'Cardio',
     description: 'An efficient cardio movement that raises heart rate quickly.',
     tips: ['Keep your jumps low and light.', 'Use short intervals to build consistency.'],
+    defaultSets: 1,
+    defaultReps: '10 min',
   },
   {
     id: 'rower',
@@ -302,6 +348,8 @@ export const exercises: Exercise[] = [
     type: 'Cardio',
     description: 'A low-impact cardio option with great endurance benefits.',
     tips: ['Drive with your legs first.', 'Keep the stroke smooth and controlled.'],
+    defaultSets: 1,
+    defaultReps: '15 min',
   },
   {
     id: 'battle-rope',
@@ -314,6 +362,8 @@ export const exercises: Exercise[] = [
     type: 'HIIT',
     description: 'A powerful conditioning drill that combines strength and cardio.',
     tips: ['Use your hips to create force.', 'Keep the motion explosive but controlled.'],
+    defaultSets: 4,
+    defaultReps: '30 sec',
   },
   {
     id: 'mobility-flow',
@@ -326,5 +376,7 @@ export const exercises: Exercise[] = [
     type: 'Mobility',
     description: 'A light movement flow to improve mobility, breath, and recovery.',
     tips: ['Move with the breath.', 'Stay within a comfortable range.'],
+    defaultSets: 1,
+    defaultReps: '10 min',
   },
 ];

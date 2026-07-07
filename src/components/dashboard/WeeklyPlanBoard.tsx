@@ -1,13 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { DayPlan, PlanExercise } from "@/data/mockPlan";
+import { getMuscleGroupColor } from "@/lib/muscleGroupColor";
+import WorkoutEditorModal from "./WorkoutEditorModal";
+import SortableRow from "./SortableRow";
 
 type DayStatus = "today" | "completed" | "partial" | "missed";
 type Temporal = "past" | "today" | "future";
 
 // Gün kartlarında aynı anda gösterilecek en fazla egzersiz sayısı (tek ekrana sığma kuralı).
-const MAX_VISIBLE_EXERCISES = 5;
+const MAX_VISIBLE_EXERCISES = 6;
+
+// "Bugün" gerçek tarihten hesaplanır, veride sabit tutulmaz (türetilebilen veri saklanmaz).
+function getTodayDayName(): string {
+  return new Date().toLocaleDateString("en-US", { weekday: "long" });
+}
 
 const statusBadgeStyles: Record<DayStatus, string> = {
   today: "bg-brand text-white shadow-sm shadow-brand/40",
@@ -22,14 +40,6 @@ const statusBadgeLabel: Record<DayStatus, string> = {
   partial: "Partial",
   missed: "Missed",
 };
-
-// Kas grubu başlıkları bu paletten sırayla renk alır (token'lardan, isim eşlemesi olmadan — herhangi bir
-// kas grubu adıyla çalışır).
-const muscleGroupPalette = ["text-brand", "text-info", "text-success", "text-warning", "text-danger"];
-
-function getMuscleGroupColor(index: number) {
-  return muscleGroupPalette[index % muscleGroupPalette.length];
-}
 
 // Tek yerde tanımlı "yumuşak yüzey" dokusu: üstten çok hafif ışıma + hayalet kenarlık + yumuşak gölge.
 // Kenarlık rengi kullanım yerinde verilir (seçili/today kartı turuncu vurgu alabildiği için).
@@ -93,18 +103,52 @@ type WeeklyPlanBoardProps = {
 };
 
 export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
+  const todayName = getTodayDayName();
   const [plan, setPlan] = useState(initialPlan);
   const [selectedDay, setSelectedDay] = useState(
-    () => plan.find((entry) => entry.isToday)?.day ?? plan[0].day,
+    () => plan.find((entry) => entry.day === todayName)?.day ?? plan[0].day,
   );
   const [planName, setPlanName] = useState("Weekly Workout Plan");
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(planName);
+  const [editingDay, setEditingDay] = useState<string | null>(null);
 
-  const todayIndex = plan.findIndex((entry) => entry.isToday);
+  const todayIndex = plan.findIndex((entry) => entry.day === todayName);
   const selectedPlan = plan.find((entry) => entry.day === selectedDay) ?? plan[0];
   const selectedGroups = groupByMuscle(selectedPlan.exercises);
   const selectedCounts = getCounts(selectedPlan);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  // Sürükleme sadece aynı kas grubu içinde geçerli: gruplar arası taşıma yok sayılır.
+  function handlePlanDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setPlan((prev) =>
+      prev.map((entry) => {
+        if (entry.day !== selectedPlan.day) return entry;
+
+        const activeItem = entry.exercises.find((exercise) => exercise.name === active.id);
+        const overItem = entry.exercises.find((exercise) => exercise.name === over.id);
+        const activeGroup = activeItem?.muscleGroup ?? "General";
+        const overGroup = overItem?.muscleGroup ?? "General";
+        if (!activeItem || !overItem || activeGroup !== overGroup) return entry;
+
+        const currentGroups = groupByMuscle(entry.exercises);
+        const groupIndex = currentGroups.findIndex((group) => group.muscleGroup === activeGroup);
+        const items = currentGroups[groupIndex].exercises;
+        const oldIndex = items.findIndex((exercise) => exercise.name === active.id);
+        const newIndex = items.findIndex((exercise) => exercise.name === over.id);
+        currentGroups[groupIndex] = { ...currentGroups[groupIndex], exercises: arrayMove(items, oldIndex, newIndex) };
+
+        return { ...entry, exercises: currentGroups.flatMap((group) => group.exercises) };
+      }),
+    );
+  }
 
   function toggleExercise(day: string, exerciseName: string) {
     setPlan((prev) =>
@@ -123,6 +167,20 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
     );
   }
 
+  function handleSaveWorkout(day: string, workoutName: string, exercises: PlanExercise[]) {
+    setPlan((prev) =>
+      prev.map((entry) => (entry.day === day ? { ...entry, workoutName, exercises } : entry)),
+    );
+    setEditingDay(null);
+  }
+
+  function handleDeleteWorkout(day: string) {
+    setPlan((prev) =>
+      prev.map((entry) => (entry.day === day ? { ...entry, workoutName: null, exercises: [] } : entry)),
+    );
+    setEditingDay(null);
+  }
+
   function startEditingName() {
     setNameDraft(planName);
     setIsEditingName(true);
@@ -135,7 +193,7 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
   }
 
   return (
-    <div className="mt-5 grid flex-1 gap-5 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_340px]">
+    <div className="mt-5 grid flex-1 gap-5 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_420px]">
       {/* HAFTALIK PLAN */}
       <section
         className={`order-2 flex min-h-0 flex-col rounded-3xl border-foreground/10 bg-surface p-5 lg:order-1 ${surfaceGlow}`}
@@ -188,21 +246,25 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
         <div className="mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:min-h-0 lg:grid-cols-4 lg:grid-rows-2">
           {plan.map((entry, index) => {
             const { total, completed } = getCounts(entry);
-            const temporal: Temporal = entry.isToday
-              ? "today"
-              : index < todayIndex
-                ? "past"
-                : "future";
+            const temporal: Temporal =
+              entry.day === todayName ? "today" : index < todayIndex ? "past" : "future";
             const status = getStatus(entry, temporal);
             const isSelected = entry.day === selectedDay;
             const hiddenCount = entry.exercises.length - MAX_VISIBLE_EXERCISES;
 
             return (
-              <button
+              <div
                 key={entry.day}
-                type="button"
+                role="button"
+                tabIndex={0}
                 aria-pressed={isSelected}
                 onClick={() => setSelectedDay(entry.day)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedDay(entry.day);
+                  }
+                }}
                 className={`flex w-full min-h-0 flex-col overflow-hidden rounded-2xl bg-surface-raised p-3 text-left ${surfaceGlowSoft} ${
                   isSelected
                     ? "border-brand/70 ring-1 ring-brand/30 bg-gradient-to-b from-brand/[0.07] to-transparent shadow-brand/20"
@@ -231,7 +293,7 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
                       {completed}/{total} exercises
                     </p>
 
-                    <div className="mt-1 min-h-0 flex-1 space-y-0.5 overflow-hidden">
+                    <div className="mt-1 flex min-h-0 flex-1 flex-col justify-center space-y-0.5 overflow-hidden">
                       {entry.exercises.slice(0, MAX_VISIBLE_EXERCISES).map((exercise) => (
                         <div
                           key={exercise.name}
@@ -253,14 +315,20 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
                       </p>
                     )}
 
-                    <span
-                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1 text-center text-xs font-semibold leading-tight ${getActionButtonClasses(
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setEditingDay(entry.day);
+                      }}
+                      aria-label={`Edit workout for ${entry.day}`}
+                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1.5 text-center text-sm font-semibold leading-tight ${getActionButtonClasses(
                         temporal,
                         false,
                       )}`}
                     >
                       Edit
-                    </span>
+                    </button>
                   </>
                 ) : (
                   <>
@@ -289,17 +357,23 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
                       </div>
                     </div>
 
-                    <span
-                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1 text-center text-xs font-semibold leading-tight ${getActionButtonClasses(
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setEditingDay(entry.day);
+                      }}
+                      aria-label={`Add workout for ${entry.day}`}
+                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1.5 text-center text-sm font-semibold leading-tight ${getActionButtonClasses(
                         temporal,
                         true,
                       )}`}
                     >
                       Add Workout
-                    </span>
+                    </button>
                   </>
                 )}
-              </button>
+              </div>
             );
           })}
         </div>
@@ -311,7 +385,7 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
       >
         <div className="shrink-0 text-center">
           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand">
-            {selectedPlan.isToday ? "Today" : selectedPlan.day}
+            {selectedPlan.day === todayName ? "Today" : selectedPlan.day}
           </p>
           <h2 className="mt-2 text-2xl font-bold">{selectedPlan.workoutName ?? "Rest Day"}</h2>
           <p className="mt-0.5 text-sm text-foreground-muted">
@@ -324,56 +398,91 @@ export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
         <div className="my-4 h-px shrink-0 bg-border" />
 
         {selectedPlan.workoutName && (
-          <div className="min-h-0 flex-1 space-y-4 overflow-hidden">
-            {selectedGroups.map((group, index) => (
-              <div key={group.muscleGroup}>
-                <p
-                  className={`border-b border-border/60 pb-1.5 text-[11px] font-bold uppercase tracking-[0.25em] ${getMuscleGroupColor(index)}`}
-                >
-                  {group.muscleGroup}
-                </p>
-                <div className="mt-2 space-y-1.5">
-                  {group.exercises.map((exercise) => (
-                    <button
-                      key={exercise.name}
-                      type="button"
-                      aria-pressed={exercise.completed}
-                      onClick={() => toggleExercise(selectedPlan.day, exercise.name)}
-                      className={`flex w-full items-center justify-between gap-2 rounded-xl bg-surface-raised px-3 py-2 ${surfaceGlowSoft} shadow-md shadow-black/15`}
-                    >
-                      <span
-                        className={`flex min-w-0 flex-1 items-center gap-2 text-[13px] ${
-                          exercise.completed
-                            ? "text-foreground-muted line-through"
-                            : "text-foreground"
-                        }`}
-                      >
-                        {exercise.completed ? (
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="h-[18px] w-[18px] shrink-0 rounded-full bg-success p-[3px] text-white shadow-sm shadow-success/40"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3.5"
-                          >
-                            <path d="m5 13 4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        ) : (
-                          <span className="h-[18px] w-[18px] shrink-0 rounded-full border border-foreground/20" />
-                        )}
-                        <span className="truncate">{exercise.name}</span>
-                      </span>
-                      <span className="shrink-0 rounded-md bg-surface px-2 py-0.5 text-[11px] font-semibold text-foreground-muted">
-                        {exercise.sets}
-                      </span>
-                    </button>
-                  ))}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handlePlanDragEnd}>
+            <div className="min-h-0 flex-1 space-y-4 overflow-hidden">
+              {selectedGroups.map((group, index) => (
+                <div key={group.muscleGroup}>
+                  <p
+                    className={`border-b border-border/60 pb-1.5 text-[11px] font-bold uppercase tracking-[0.25em] ${getMuscleGroupColor(index)}`}
+                  >
+                    {group.muscleGroup}
+                  </p>
+                  <SortableContext
+                    items={group.exercises.map((exercise) => exercise.name)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="mt-2 space-y-1.5">
+                      {group.exercises.map((exercise) => (
+                        <SortableRow key={exercise.name} id={exercise.name}>
+                          {({ attributes, listeners }) => (
+                            <div
+                              role="button"
+                              tabIndex={0}
+                              aria-pressed={exercise.completed}
+                              onClick={() => toggleExercise(selectedPlan.day, exercise.name)}
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                  event.preventDefault();
+                                  toggleExercise(selectedPlan.day, exercise.name);
+                                }
+                              }}
+                              className={`flex w-full items-center gap-2 rounded-xl bg-surface-raised px-3 py-2 ${surfaceGlowSoft} shadow-md shadow-black/15`}
+                            >
+                              <span
+                                {...attributes}
+                                {...listeners}
+                                onClick={(event) => event.stopPropagation()}
+                                className="shrink-0 cursor-grab select-none touch-none text-foreground-muted/40 active:cursor-grabbing"
+                                aria-label={`Reorder ${exercise.name}`}
+                              >
+                                ⠿
+                              </span>
+                              <span
+                                className={`flex min-w-0 flex-1 items-center gap-2 text-[13px] ${
+                                  exercise.completed
+                                    ? "text-foreground-muted line-through"
+                                    : "text-foreground"
+                                }`}
+                              >
+                                {exercise.completed ? (
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    className="h-[18px] w-[18px] shrink-0 rounded-full bg-success p-[3px] text-white shadow-sm shadow-success/40"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3.5"
+                                  >
+                                    <path d="m5 13 4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                ) : (
+                                  <span className="h-[18px] w-[18px] shrink-0 rounded-full border border-foreground/20" />
+                                )}
+                                <span className="truncate">{exercise.name}</span>
+                              </span>
+                              <span className="shrink-0 rounded-md bg-surface px-2 py-0.5 text-[11px] font-semibold text-foreground-muted">
+                                {exercise.sets}
+                              </span>
+                            </div>
+                          )}
+                        </SortableRow>
+                      ))}
+                    </div>
+                  </SortableContext>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </DndContext>
         )}
       </aside>
+
+      {editingDay && (
+        <WorkoutEditorModal
+          day={plan.find((entry) => entry.day === editingDay) ?? plan[0]}
+          onClose={() => setEditingDay(null)}
+          onSave={handleSaveWorkout}
+          onDelete={handleDeleteWorkout}
+        />
+      )}
     </div>
   );
 }

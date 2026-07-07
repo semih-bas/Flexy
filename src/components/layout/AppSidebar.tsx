@@ -85,7 +85,7 @@ export default function AppSidebar() {
         type="button"
         aria-label="Close sidebar backdrop"
         onClick={closeSidebar}
-        className={`fixed inset-0 z-30 bg-foreground/60 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-30 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
       />
