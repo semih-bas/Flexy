@@ -1,43 +1,9 @@
 import Link from 'next/link';
-import StoreButton from './StoreButton';
 
 const heroStats = [
   { value: '7-Day', label: 'Planning' },
   { value: '25+', label: 'Exercises' },
   { value: 'Easy', label: 'Progress Tracking' },
-];
-
-// Telefonun etrafına asılı duran özellik çıkıntıları: sadece lg+ ekranlarda gösterilir
-// (bkz. altta phoneCalloutPosition), mobilde HeroSection bunları düz bir liste olarak gösterir.
-const heroCallouts = [
-  {
-    title: 'Personalized Plans',
-    description: 'Build a weekly routine around your goals.',
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M8 4h8a1 1 0 0 1 1 1v15l-5-3-5 3V5a1 1 0 0 1 1-1Z" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Track Progress',
-    description: 'See completed work and weekly momentum.',
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <circle cx="12" cy="12" r="8" />
-        <circle cx="12" cy="12" r="3" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Save Favorites',
-    description: 'Keep your best routines ready to reuse.',
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1Z" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
 ];
 
 const miniWeek: { day: string; status: 'completed' | 'today' | 'upcoming' }[] = [
@@ -122,6 +88,8 @@ export default function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            {/* TODO: Faz 3'te auth eklenince burası bir auth gate'ten geçecek (girişsiz kullanıcı
+                önce login/signup'a yönlendirilebilir). Geliştirme sürecinde doğrudan /dashboard'a gider. */}
             <Link
               href="/dashboard"
               className="rounded-2xl bg-brand px-6 py-3 text-center text-sm font-bold text-white shadow-lg shadow-brand/30 transition hover:bg-brand/90"
@@ -151,7 +119,8 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Telefon, hero'nun sağ yarısını kaplar; büyük ekranda etrafına özellik çıkıntıları asılır. */}
+        {/* Telefon, hero'nun sağ yarısını kaplar. Özellikler ayrıca anlatılmıyor burada —
+            "Why Flexy" bölümü bu işi zaten yapıyor, hero sade kalsın diye sadece başlık + telefon. */}
         <div className="relative mx-auto w-full max-w-[320px] py-4 lg:max-w-none lg:py-10">
           <div className="relative z-10 mx-auto w-[260px] sm:w-[300px] lg:w-[320px]">
             <div aria-hidden className="absolute -inset-8 rounded-[3.5rem] bg-brand/15 blur-3xl" />
@@ -241,59 +210,6 @@ export default function HeroSection() {
                 className="absolute bottom-2 left-1/2 h-1 w-20 -translate-x-1/2 rounded-full bg-foreground/15"
               />
             </div>
-          </div>
-
-          {/* Masaüstünde telefonun etrafına asılı özellik çıkıntıları, çizgiyle telefona bağlanır. */}
-          <div aria-hidden={false} className="pointer-events-none absolute inset-0 z-20 hidden lg:block">
-            <div className="pointer-events-auto absolute -left-6 top-6 flex w-44 items-center gap-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand/25 bg-surface text-brand shadow-lg shadow-black/30">
-                {heroCallouts[0].icon}
-              </div>
-              <p className="rounded-xl border border-foreground-muted/10 bg-surface px-3 py-2 text-xs font-bold leading-tight text-foreground shadow-lg shadow-black/30">
-                {heroCallouts[0].title}
-              </p>
-              <span className="absolute left-full top-1/2 h-px w-6 -translate-y-1/2 bg-gradient-to-r from-brand/50 to-transparent" />
-            </div>
-
-            <div className="pointer-events-auto absolute -right-8 top-1/2 flex w-44 -translate-y-1/2 flex-row-reverse items-center gap-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand/25 bg-surface text-brand shadow-lg shadow-black/30">
-                {heroCallouts[1].icon}
-              </div>
-              <p className="rounded-xl border border-foreground-muted/10 bg-surface px-3 py-2 text-right text-xs font-bold leading-tight text-foreground shadow-lg shadow-black/30">
-                {heroCallouts[1].title}
-              </p>
-              <span className="absolute right-full top-1/2 h-px w-6 -translate-y-1/2 bg-gradient-to-l from-brand/50 to-transparent" />
-            </div>
-
-            <div className="pointer-events-auto absolute -left-4 bottom-10 flex w-44 items-center gap-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand/25 bg-surface text-brand shadow-lg shadow-black/30">
-                {heroCallouts[2].icon}
-              </div>
-              <p className="rounded-xl border border-foreground-muted/10 bg-surface px-3 py-2 text-xs font-bold leading-tight text-foreground shadow-lg shadow-black/30">
-                {heroCallouts[2].title}
-              </p>
-              <span className="absolute left-full top-1/2 h-px w-4 -translate-y-1/2 bg-gradient-to-r from-brand/50 to-transparent" />
-            </div>
-          </div>
-
-          {/* Mobil/tablet: çıkıntılar telefonun altına düz liste olarak iner. */}
-          <div className="mx-auto mt-8 max-w-[300px] space-y-3 lg:hidden">
-            {heroCallouts.map((feature) => (
-              <div key={feature.title} className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand/20 bg-brand/10 text-brand">
-                  {feature.icon}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground">{feature.title}</p>
-                  <p className="mt-0.5 text-xs leading-5 text-foreground-muted">{feature.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mx-auto mt-6 flex max-w-[300px] flex-col gap-2.5">
-            <StoreButton storeName="App Store" label="Coming soon" />
-            <StoreButton storeName="Google Play" label="Coming soon" />
           </div>
         </div>
       </div>

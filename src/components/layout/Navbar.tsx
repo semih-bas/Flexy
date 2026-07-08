@@ -63,22 +63,20 @@ export default function Navbar() {
             ))}
           </div>
 
-          <button
-            type="button"
-            disabled
+          <a
+            href="#"
             title="Coming soon"
-            className="cursor-not-allowed rounded-full border border-foreground-muted/20 px-3 py-2 text-sm font-semibold text-foreground-muted sm:px-4"
+            className="rounded-full border border-foreground-muted/20 px-3 py-2 text-sm font-semibold text-foreground-muted transition hover:border-brand/40 hover:text-foreground sm:px-4"
           >
             Login
-          </button>
-          <button
-            type="button"
-            disabled
+          </a>
+          <a
+            href="#"
             title="Coming soon"
-            className="cursor-not-allowed rounded-full bg-brand px-3 py-2 text-sm font-semibold text-white opacity-80 shadow-sm shadow-brand/30 sm:px-4"
+            className="rounded-full bg-brand px-3 py-2 text-sm font-semibold text-white shadow-sm shadow-brand/30 transition hover:bg-brand/90 sm:px-4"
           >
             Create Account
-          </button>
+          </a>
         </div>
       </nav>
     </header>
