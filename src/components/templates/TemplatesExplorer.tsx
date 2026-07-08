@@ -4,8 +4,9 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TemplateCategory, WorkoutTemplate } from '@/data/workoutTemplates';
 import { usePlan } from '@/components/plan/PlanProvider';
+import PlanPreviewModal from '@/components/plan/PlanPreviewModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import TemplateCard from './TemplateCard';
-import TemplatePreviewModal from './TemplatePreviewModal';
 
 type CategoryFilter = TemplateCategory | 'All';
 
@@ -25,11 +26,6 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
     if (selectedCategory === 'All') return templates;
     return templates.filter((template) => template.categories.includes(selectedCategory));
   }, [templates, selectedCategory]);
-
-  function handleUsePlan(template: WorkoutTemplate) {
-    setPreviewingTemplate(null);
-    setConfirmingTemplate(template);
-  }
 
   function confirmUsePlan() {
     if (!confirmingTemplate) return;
@@ -98,46 +94,26 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
       )}
 
       {previewingTemplate && (
-        <TemplatePreviewModal
-          template={previewingTemplate}
+        <PlanPreviewModal
+          title={previewingTemplate.name}
+          subtitle={`${previewingTemplate.level} · ${previewingTemplate.daysPerWeek} days per week`}
+          days={previewingTemplate.days}
           onClose={() => setPreviewingTemplate(null)}
-          onUse={() => handleUsePlan(previewingTemplate)}
+          onUse={() => {
+            setPreviewingTemplate(null);
+            setConfirmingTemplate(previewingTemplate);
+          }}
         />
       )}
 
       {confirmingTemplate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <button
-            type="button"
-            aria-label="Close confirmation backdrop"
-            onClick={() => setConfirmingTemplate(null)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-          />
-
-          <div className="relative w-full max-w-sm rounded-3xl border border-foreground/10 bg-surface p-6 shadow-2xl shadow-black/40">
-            <h2 className="text-lg font-bold text-foreground">Use &ldquo;{confirmingTemplate.name}&rdquo;?</h2>
-            <p className="mt-2 text-sm leading-6 text-foreground-muted">
-              This will overwrite your current weekly plan on the dashboard. This can&apos;t be undone.
-            </p>
-
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setConfirmingTemplate(null)}
-                className="rounded-xl border border-border px-4 py-2 text-sm font-semibold text-foreground-muted transition hover:border-brand/40 hover:text-foreground"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={confirmUsePlan}
-                className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand/25 transition hover:bg-brand/90"
-              >
-                Use Plan
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={`Use "${confirmingTemplate.name}"?`}
+          description="This will overwrite your current weekly plan on the dashboard. This can't be undone."
+          confirmLabel="Use Plan"
+          onConfirm={confirmUsePlan}
+          onCancel={() => setConfirmingTemplate(null)}
+        />
       )}
     </>
   );

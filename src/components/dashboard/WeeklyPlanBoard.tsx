@@ -15,6 +15,7 @@ import type { DayPlan, PlanExercise } from "@/data/mockPlan";
 import { getMuscleGroupColor } from "@/lib/muscleGroupColor";
 import { surfaceGlow, surfaceGlowSoft } from "@/lib/surfaceStyles";
 import { usePlan } from "@/components/plan/PlanProvider";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import WorkoutEditorModal from "./WorkoutEditorModal";
 import SortableRow from "./SortableRow";
 
@@ -95,7 +96,7 @@ function groupByMuscle(exercises: PlanExercise[]) {
 
 export default function WeeklyPlanBoard() {
   const todayName = getTodayDayName();
-  const { plan, setPlan } = usePlan();
+  const { plan, setPlan, favoritePlans, saveFavoritePlan } = usePlan();
   const [selectedDay, setSelectedDay] = useState(
     () => plan.find((entry) => entry.day === todayName)?.day ?? plan[0].day,
   );
@@ -103,6 +104,7 @@ export default function WeeklyPlanBoard() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(planName);
   const [editingDay, setEditingDay] = useState<string | null>(null);
+  const [confirmingOverwrite, setConfirmingOverwrite] = useState(false);
 
   const todayIndex = plan.findIndex((entry) => entry.day === todayName);
   const selectedPlan = plan.find((entry) => entry.day === selectedDay) ?? plan[0];
@@ -183,6 +185,18 @@ export default function WeeklyPlanBoard() {
     setIsEditingName(false);
   }
 
+  // Aynı adla kayıtlı favori varsa önce onay ister (üzerine yazılacağı için); yoksa doğrudan kaydeder.
+  function handleSaveFavoriteClick() {
+    const exists = favoritePlans.some(
+      (favorite) => favorite.name.trim().toLowerCase() === planName.trim().toLowerCase(),
+    );
+    if (exists) {
+      setConfirmingOverwrite(true);
+    } else {
+      saveFavoritePlan(planName, plan);
+    }
+  }
+
   return (
     <div className="mt-5 grid flex-1 gap-5 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_420px]">
       {/* HAFTALIK PLAN */}
@@ -232,6 +246,22 @@ export default function WeeklyPlanBoard() {
               </button>
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={handleSaveFavoriteClick}
+            aria-label="Save as favorite"
+            title="Save as favorite"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-foreground-muted/15 bg-foreground/5 text-foreground-muted transition hover:bg-foreground/10 hover:text-brand"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path
+                d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1Z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         </div>
 
         <div className="mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:min-h-0 lg:grid-cols-4 lg:grid-rows-2">
@@ -472,6 +502,19 @@ export default function WeeklyPlanBoard() {
           onClose={() => setEditingDay(null)}
           onSave={handleSaveWorkout}
           onDelete={handleDeleteWorkout}
+        />
+      )}
+
+      {confirmingOverwrite && (
+        <ConfirmDialog
+          title={`Overwrite "${planName}"?`}
+          description="A favorite plan with this name already exists. Saving will replace it with your current week."
+          confirmLabel="Overwrite"
+          onConfirm={() => {
+            saveFavoritePlan(planName, plan);
+            setConfirmingOverwrite(false);
+          }}
+          onCancel={() => setConfirmingOverwrite(false)}
         />
       )}
     </div>
