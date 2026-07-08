@@ -108,15 +108,15 @@ function groupByMuscle(exercises: PlanExercise[]) {
 
 export default function WeeklyPlanBoard() {
   const todayName = getTodayDayName();
-  const { plan, setPlan, favoritePlans, saveFavoritePlan } = usePlan();
+  const { plan, setPlan, activePlanName, activeFavoriteId, renameActivePlan, saveActivePlanAsFavorite, favoritePlans } =
+    usePlan();
   const { weekStartDay } = useSettings();
   const displayPlan = orderByWeekStart(plan, weekStartDay);
   const [selectedDay, setSelectedDay] = useState(
     () => plan.find((entry) => entry.day === todayName)?.day ?? displayPlan[0].day,
   );
-  const [planName, setPlanName] = useState("Weekly Workout Plan");
   const [isEditingName, setIsEditingName] = useState(false);
-  const [nameDraft, setNameDraft] = useState(planName);
+  const [nameDraft, setNameDraft] = useState(activePlanName);
   const [editingDay, setEditingDay] = useState<string | null>(null);
   const [confirmingOverwrite, setConfirmingOverwrite] = useState(false);
 
@@ -194,25 +194,31 @@ export default function WeeklyPlanBoard() {
   }
 
   function startEditingName() {
-    setNameDraft(planName);
+    setNameDraft(activePlanName);
     setIsEditingName(true);
   }
 
   function commitNameEdit() {
-    const trimmed = nameDraft.trim();
-    setPlanName(trimmed === "" ? "My Plan" : trimmed);
+    renameActivePlan(nameDraft);
     setIsEditingName(false);
   }
 
-  // Aynı adla kayıtlı favori varsa önce onay ister (üzerine yazılacağı için); yoksa doğrudan kaydeder.
+  // Aktif plan zaten bir favoriye bağlıysa doğrudan o favoriyi günceller (aynı ad, aynı favori —
+  // sormaya gerek yok). Bağlı değilse aynı adla başka bir favori var mı diye önce sorar (yoksa
+  // üzerine yazılacağı için), yoksa doğrudan yeni favori olarak kaydeder ve bağı kurar.
   function handleSaveFavoriteClick() {
+    if (activeFavoriteId) {
+      saveActivePlanAsFavorite(activePlanName);
+      return;
+    }
+
     const exists = favoritePlans.some(
-      (favorite) => favorite.name.trim().toLowerCase() === planName.trim().toLowerCase(),
+      (favorite) => favorite.name.trim().toLowerCase() === activePlanName.trim().toLowerCase(),
     );
     if (exists) {
       setConfirmingOverwrite(true);
     } else {
-      saveFavoritePlan(planName, plan);
+      saveActivePlanAsFavorite(activePlanName);
     }
   }
 
@@ -248,7 +254,7 @@ export default function WeeklyPlanBoard() {
                 aria-label="Edit plan name"
                 className="mt-1 flex items-center gap-2 text-left"
               >
-                <h2 className="truncate text-xl font-bold">{planName}</h2>
+                <h2 className="truncate text-xl font-bold">{activePlanName}</h2>
                 <svg
                   viewBox="0 0 24 24"
                   className="h-3.5 w-3.5 shrink-0 text-foreground-muted"
@@ -535,11 +541,11 @@ export default function WeeklyPlanBoard() {
 
       {confirmingOverwrite && (
         <ConfirmDialog
-          title={`Overwrite "${planName}"?`}
+          title={`Overwrite "${activePlanName}"?`}
           description="A favorite plan with this name already exists. Saving will replace it with your current week."
           confirmLabel="Overwrite"
           onConfirm={() => {
-            saveFavoritePlan(planName, plan);
+            saveActivePlanAsFavorite(activePlanName);
             setConfirmingOverwrite(false);
           }}
           onCancel={() => setConfirmingOverwrite(false)}

@@ -4,10 +4,10 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TemplateCategory, WorkoutTemplate } from '@/data/workoutTemplates';
 import { usePlan } from '@/components/plan/PlanProvider';
-import PlanPreviewModal from '@/components/plan/PlanPreviewModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { buildWeekFromTemplate } from '@/lib/applyTemplate';
 import TemplateCard from './TemplateCard';
+import TemplatePreviewModal from './TemplatePreviewModal';
 
 type CategoryFilter = TemplateCategory | 'All';
 
@@ -118,10 +118,8 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
       )}
 
       {previewingTemplate && (
-        <PlanPreviewModal
-          title={previewingTemplate.name}
-          subtitle={`${previewingTemplate.level} · ${previewingTemplate.daysPerWeek} days per week`}
-          days={previewingTemplate.days}
+        <TemplatePreviewModal
+          template={previewingTemplate}
           onClose={() => setPreviewingTemplate(null)}
           onUse={() => {
             const template = previewingTemplate;

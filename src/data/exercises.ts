@@ -1,8 +1,8 @@
 export type ExerciseCategory = 'Chest' | 'Back' | 'Shoulders' | 'Biceps' | 'Triceps' | 'Legs' | 'Core' | 'Cardio';
 export type ExerciseLevel = 'Beginner' | 'Intermediate' | 'Advanced';
-// Antrenman niteliği (Strength/Mobility/HIIT vb.) — kart üzerinde gösterilmiyor, ileride detay
-// sayfasında kullanılabilir. Kart üzerindeki basit "Compound/Isolation/Cardio" etiketi için
-// aşağıdaki `ExerciseMovementType` / `type` alanına bakın.
+// Antrenman niteliği (Strength/Mobility/HIIT vb.) — kart üzerinde gösterilmiyor, detay
+// sayfasındaki TRAINING PROFILE > Training Goal kutusunda kullanılıyor. Kart üzerindeki basit
+// "Compound/Isolation/Cardio" etiketi için aşağıdaki `ExerciseMovementType` / `type` alanına bakın.
 export type ExerciseType = 'Strength' | 'Mobility' | 'Cardio' | 'HIIT' | 'Recovery';
 export type ExerciseMovementType = 'Compound' | 'Isolation' | 'Cardio';
 
@@ -16,6 +16,20 @@ export type Exercise = {
   level: ExerciseLevel;
   trainingType: ExerciseType;
   type: ExerciseMovementType;
+  // Detay sayfasının PATTERN bilgi kutusu ve TRAINING PROFILE > Movement Pattern kartı için
+  // (örn. "Horizontal Push", "Hip Hinge"). Sabit bir liste yerine serbest metin: hareket
+  // desenleri egzersizden egzersize çok çeşitlendiği için kapalı bir union zorlamak yapaylık katardı.
+  pattern: string;
+  // TRAINING PROFILE > Main Purpose.
+  purpose: string;
+  // TRAINING PROFILE > Strength Benefit / Hypertrophy Benefit.
+  strengthBenefit: string;
+  hypertrophyBenefit: string;
+  // Detay sayfasının en altındaki Quick Fact kartı.
+  // TODO: Bu 5 alanın içeriği (pattern/purpose/strengthBenefit/hypertrophyBenefit/quickFact) şimdilik
+  // makul ama kısa/genel tutuldu — içerik derinleştirme (daha spesifik, egzersize özel metinler)
+  // sonraki bir fazda yapılacak.
+  quickFact: string;
   // Eski projeden taşınan egzersiz fotoğrafı (public/exercises/). Yoksa kartta placeholder gösterilir.
   image?: string;
   description: string;
@@ -49,6 +63,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Horizontal Push',
+    purpose: 'Build pushing strength and chest control using just body weight.',
+    strengthBenefit: 'Builds functional pressing strength without any equipment.',
+    hypertrophyBenefit: 'Adds modest chest, triceps, and shoulder size when reps are pushed close to failure.',
+    quickFact: 'Elevating your hands or feet is an easy way to shift the load up or down without changing the movement.',
     description:
       "The push-up is a bodyweight pressing movement that trains the chest, triceps, and front shoulders while demanding steady core control. It's easy to scale up or down by elevating the hands or feet, which makes it useful at almost any training level.",
     tips: [
@@ -75,6 +94,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Horizontal Push',
+    purpose: 'Build maximal pressing strength for the chest, shoulders, and triceps.',
+    strengthBenefit: 'One of the most direct ways to build raw upper-body pressing strength.',
+    hypertrophyBenefit: 'Heavy, progressive loading makes it a top driver of chest and triceps size.',
+    quickFact: 'A stable leg drive and retracted shoulder blades let you press more weight safely.',
     image: '/exercises/Bench Press.png',
     description:
       "The barbell bench press is one of the most widely used movements for building chest pressing strength, and it also loads the triceps and front delts along the way. Performed with stable shoulder positioning, it's a reliable strength and size builder for the whole upper-body press.",
@@ -102,6 +126,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Horizontal Push (Incline)',
+    purpose: 'Emphasize the upper chest with a longer, dumbbell-driven range of motion.',
+    strengthBenefit: 'Builds pressing strength through a deep, joint-friendly range of motion.',
+    hypertrophyBenefit: 'Strong driver of upper chest growth thanks to the incline angle.',
+    quickFact: 'Independent dumbbells let each side move through its own natural path, which helps fix side-to-side imbalances.',
     image: '/exercises/Incline Dumbbell Press.png',
     description:
       'The incline dumbbell press emphasizes the upper chest while allowing a larger, more natural range of motion than a barbell press. Because each arm works independently, it also helps even out side-to-side strength differences.',
@@ -129,6 +158,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Vertical Pull',
+    purpose: 'Build vertical pulling strength and width in the back.',
+    strengthBenefit: 'Adjustable loading makes it easy to build pulling strength at any level.',
+    hypertrophyBenefit: 'Reliable way to add width and thickness to the lats and upper back.',
+    quickFact: 'It trains a similar pattern to the pull-up, making it a great stepping stone toward bodyweight pulling.',
     image: '/exercises/Lat Pulldown.png',
     description:
       'The lat pulldown is a machine-based vertical pull that trains the lats and upper back with easily adjustable loading. It builds a similar pulling pattern to the pull-up, which makes it a useful stepping stone toward bodyweight pulling strength.',
@@ -156,6 +190,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Horizontal Pull',
+    purpose: 'Build horizontal pulling strength and thickness through the back.',
+    strengthBenefit: 'A foundational lift for building total back and grip strength.',
+    hypertrophyBenefit: 'Heavy rowing volume is a strong driver of mid-back and lat thickness.',
+    quickFact: 'Keeping a flat, hinged torso throughout the set protects the lower back under load.',
     image: '/exercises/Barbell Row.png',
     description:
       "The bent-over row is a compound horizontal pull for the back and lats that also challenges hip-hinge position and trunk stability. It's a foundational back-builder that pairs well with vertical pulling work like the lat pulldown.",
@@ -183,6 +222,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Horizontal Pull',
+    purpose: 'Build controlled horizontal pulling strength with steady cable tension.',
+    strengthBenefit: 'Constant tension makes it a dependable pulling-strength builder with low setup demands.',
+    hypertrophyBenefit: 'Great for accumulating back volume without heavy spinal loading.',
+    quickFact: 'Keeping the torso quiet and letting the shoulder blades do the work isolates the back muscles better.',
     image: '/exercises/Seated Cable Row.png',
     description:
       "The seated cable row is a horizontal pulling movement for the upper back and lats that keeps steady tension throughout the set. It's a great exercise for practicing controlled shoulder-blade movement and elbow drive without needing much setup.",
@@ -210,6 +254,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Vertical Push',
+    purpose: 'Build raw shoulder and triceps pressing strength overhead.',
+    strengthBenefit: 'One of the most direct tests and builders of overhead pressing strength.',
+    hypertrophyBenefit: 'Heavy overhead volume is a strong driver of shoulder size.',
+    quickFact: 'Bracing the core hard before each rep keeps the bar path stable and protects the lower back.',
     image: '/exercises/Overhead Press.png',
     description:
       "The standing overhead press is a compound lift that builds raw shoulder and triceps pressing strength while demanding tight core bracing to keep the bar path stable overhead. It's one of the most direct ways to build shoulder size and pressing power.",
@@ -237,6 +286,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Shoulder Abduction',
+    purpose: 'Isolate the side delts to build shoulder width.',
+    strengthBenefit: "Builds targeted strength in a muscle that's hard to load directly with compound lifts.",
+    hypertrophyBenefit: 'One of the best isolation moves for building visible shoulder width.',
+    quickFact: 'Leading with the elbows instead of the hands keeps the tension on the side delts.',
     image: '/exercises/Lateral Raise.png',
     description:
       "The dumbbell lateral raise isolates the side delts to build shoulder width without relying much on the triceps or upper chest. It's a light-load, high-control movement that pairs well after heavier pressing work.",
@@ -264,6 +318,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Shoulder Flexion',
+    purpose: 'Isolate the front delts with a simple raising motion.',
+    strengthBenefit: 'Builds light, targeted strength in the front shoulder without heavy loading.',
+    hypertrophyBenefit: 'Useful accessory for rounding out shoulder development after pressing work.',
+    quickFact: 'Because the front delts already work hard during pressing, this exercise needs only light-to-moderate weight.',
     image: '/exercises/Front Raise.png',
     description:
       "The front raise isolates the front delts with a simple, controlled arm-raising pattern. It's a good accessory movement for rounding out shoulder development after compound pressing.",
@@ -291,6 +350,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Elbow Flexion',
+    purpose: 'Build classic biceps size and strength.',
+    strengthBenefit: 'A straightforward way to build raw biceps and forearm strength.',
+    hypertrophyBenefit: 'A staple for building biceps peak and overall arm size.',
+    quickFact: 'Keeping the elbows pinned to your sides isolates the biceps instead of the front delts.',
     image: '/exercises/Barbell Curl.png',
     description:
       "The barbell curl is a classic biceps isolation movement that builds arm size and strength with a straightforward, repeatable motion. It's a strength staple for arm-focused training days.",
@@ -318,6 +382,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Elbow Flexion (Neutral Grip)',
+    purpose: 'Build biceps and forearm size with a neutral, joint-friendly grip.',
+    strengthBenefit: 'Builds grip and forearm strength alongside the biceps.',
+    hypertrophyBenefit: 'Neutral grip shifts extra emphasis onto the brachialis for a fuller-looking arm.',
+    quickFact: 'The brachialis sits under the biceps and, when developed, pushes the biceps up for a bigger peak.',
     image: '/exercises/Hammer Curl.png',
     description:
       'The hammer curl trains the biceps and brachialis with a neutral, palms-in grip that also builds forearm strength. It works well alongside standard curls to round out arm training.',
@@ -345,6 +414,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Elbow Flexion (Fixed Arm)',
+    purpose: 'Isolate the biceps with strict form and no body swing.',
+    strengthBenefit: 'Removes momentum, so strength gains carry over directly to biceps control.',
+    hypertrophyBenefit: 'Excellent for peak biceps contraction and finishing arm volume.',
+    quickFact: 'Locking the upper arms against the pad makes it nearly impossible to cheat the rep.',
     image: '/exercises/Preacher Curl.png',
     description:
       "The preacher curl isolates the biceps by locking the upper arms against a pad, removing body swing from the equation. It's an effective way to build peak biceps contraction with strict form.",
@@ -372,6 +446,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Vertical Push',
+    purpose: 'Build pressing strength focused on the triceps.',
+    strengthBenefit: 'Builds strong bodyweight pressing strength through a deep range of motion.',
+    hypertrophyBenefit: 'An upright torso position shifts more of the load onto the triceps for size.',
+    quickFact: 'Staying upright through the torso keeps the emphasis on the triceps instead of the chest.',
     image: '/exercises/Chest Dip.png',
     description:
       'The triceps dip is a bodyweight pressing movement performed on parallel bars that builds strength in the triceps, chest, and front shoulders. Staying more upright through the torso shifts more of the work onto the triceps.',
@@ -399,6 +478,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Elbow Extension',
+    purpose: 'Isolate the triceps through a long, stretched range of motion.',
+    strengthBenefit: 'Builds triceps lockout strength useful for all pressing movements.',
+    hypertrophyBenefit: 'The long stretch under load makes it a strong triceps size builder.',
+    quickFact: 'Keeping the upper arms fixed and perpendicular to the floor keeps tension on the triceps throughout.',
     image: '/exercises/Skull Crusher.png',
     description:
       'The skull crusher is a focused triceps isolation movement performed lying down with a barbell or dumbbells. It builds triceps size and strength through a long, controlled range of motion.',
@@ -426,6 +510,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Elbow Extension',
+    purpose: 'Finish triceps training with constant cable tension.',
+    strengthBenefit: 'Reinforces triceps lockout strength with low joint stress.',
+    hypertrophyBenefit: 'Constant tension makes it a reliable finisher for triceps volume.',
+    quickFact: 'Spreading the rope apart at the bottom adds a stronger peak contraction.',
     image: '/exercises/Tricep Pushdown.png',
     description:
       "The rope pushdown is a cable isolation exercise that targets the triceps through a controlled pressing-down motion. Its constant cable tension makes it a reliable finisher for arm training.",
@@ -453,6 +542,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Squat (Knee Dominant)',
+    purpose: 'Build total lower-body strength and size.',
+    strengthBenefit: 'One of the most effective lifts for building total-body and leg strength.',
+    hypertrophyBenefit: 'Heavy squatting is a top driver of quad and glute size.',
+    quickFact: 'Driving evenly through the whole foot, not just the toes, keeps the movement balanced and safe.',
     image: '/exercises/Barbell Squat.png',
     description:
       "The back squat is a foundational compound lift that builds strength and size across the quads, glutes, and core. It's one of the most effective exercises for developing total lower-body strength.",
@@ -480,6 +574,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Hip Hinge',
+    purpose: 'Build posterior-chain strength through the hamstrings and glutes.',
+    strengthBenefit: 'A key strength builder for the hip hinge pattern used in deadlifts and sprinting.',
+    hypertrophyBenefit: 'The deep hamstring stretch under load makes it a strong hypertrophy driver for the posterior chain.',
+    quickFact: 'A soft knee bend held constant throughout the set keeps the tension on the hamstrings.',
     image: '/exercises/Romanian Deadlift.png',
     description:
       "The Romanian deadlift is a hip-hinge movement that builds strength in the hamstrings and glutes while training a strong posterior-chain pattern. It's a key accessory to the conventional deadlift for building hamstring resilience.",
@@ -507,6 +606,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Compound',
+    pattern: 'Single-Leg Squat',
+    purpose: 'Build unilateral leg strength, balance, and coordination.',
+    strengthBenefit: 'Trains each leg independently, helping close side-to-side strength gaps.',
+    hypertrophyBenefit: 'Solid quad and glute builder that also challenges stability under load.',
+    quickFact: "Moving through space one step at a time adds a balance demand that stationary lunges don't.",
     image: '/exercises/Walking Lunge.png',
     description:
       'The walking lunge builds unilateral leg strength, balance, and coordination by moving through space one step at a time. It challenges each leg independently, which helps address side-to-side strength differences.',
@@ -534,6 +638,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Isometric Core Hold',
+    purpose: 'Build trunk stability and total-body tension.',
+    strengthBenefit: 'Builds the core stability that underpins strength in almost every other lift.',
+    hypertrophyBenefit: 'Not a primary size builder, but supports better bracing during heavier hypertrophy work.',
+    quickFact: 'A dead-straight line from head to heels matters more than how long you can hold the position.',
     image: '/exercises/Plank.png',
     description:
       "The plank is an isometric core hold that builds trunk stability and full-body tension without any equipment. It's a simple, scalable way to train the abs and lower back to resist unwanted movement.",
@@ -561,6 +670,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Mobility',
     type: 'Isolation',
+    pattern: 'Anti-Extension Core',
+    purpose: 'Build core control by keeping the spine stable while the limbs move.',
+    strengthBenefit: 'Reinforces the core bracing skill needed to protect the spine under load.',
+    hypertrophyBenefit: "Not aimed at size — it's a control and stability drill, not a mass builder.",
+    quickFact: 'Pressing the lower back into the floor throughout the set is the key checkpoint for good form.',
     description:
       'The dead bug trains core control and coordination by keeping the lower back stable while the arms and legs move independently. It’s a gentle, joint-friendly way to build trunk stability.',
     tips: [
@@ -587,6 +701,11 @@ export const exercises: Exercise[] = [
     level: 'Intermediate',
     trainingType: 'Strength',
     type: 'Isolation',
+    pattern: 'Isometric Core Hold',
+    purpose: 'Build compact, full-body core tension.',
+    strengthBenefit: 'Builds the rigid core tension used in gymnastics and heavy compound lifts alike.',
+    hypertrophyBenefit: 'Minimal size impact — this is primarily a strength and control drill.',
+    quickFact: 'Bending the knees to shorten the lever is an easy way to scale the hold down when it gets too hard.',
     description:
       "The hollow hold is a compact isometric core drill that builds full-body tension and abdominal strength. It's a staple in gymnastics-style training for building a strong, stable trunk.",
     tips: [
@@ -613,6 +732,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Cardio',
     type: 'Cardio',
+    pattern: 'Locomotion / Conditioning',
+    purpose: 'Raise heart rate quickly while building coordination.',
+    strengthBenefit: 'Builds calf and lower-leg endurance strength over repeated sessions.',
+    hypertrophyBenefit: 'Minimal muscle-size impact — this is a conditioning tool, not a mass builder.',
+    quickFact: 'Turning the rope with the wrists instead of the whole arms saves energy over longer sets.',
     image: '/exercises/Jump Rope.png',
     description:
       'Jump rope is an efficient cardio movement that raises heart rate quickly while building coordination and calf endurance. Short, consistent intervals make it easy to fit into any conditioning session.',
@@ -640,6 +764,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Cardio',
     type: 'Cardio',
+    pattern: 'Full-Body Pull / Conditioning',
+    purpose: 'Build cardio endurance using a low-impact, full-body pulling motion.',
+    strengthBenefit: 'Builds light full-body strength endurance alongside the cardio benefit.',
+    hypertrophyBenefit: "Minimal size impact — its main value is conditioning, not muscle growth.",
+    quickFact: 'Driving with the legs before leaning back and pulling keeps the stroke efficient and joint-friendly.',
     description:
       'The rowing machine is a low-impact, full-body cardio option that builds endurance while training the legs, back, and arms together. Its smooth resistance makes it a joint-friendly way to build conditioning.',
     tips: [
@@ -666,6 +795,11 @@ export const exercises: Exercise[] = [
     level: 'Advanced',
     trainingType: 'HIIT',
     type: 'Cardio',
+    pattern: 'Full-Body Power / Conditioning',
+    purpose: 'Combine strength and cardio through explosive, full-body waves.',
+    strengthBenefit: 'Builds short-burst power endurance in the shoulders, core, and legs.',
+    hypertrophyBenefit: 'Some upper-body and core size stimulus, but conditioning is the main goal.',
+    quickFact: 'Driving the slams from the hips and legs, not just the arms, is what makes the movement sustainable.',
     description:
       'Battle rope slams are a high-intensity conditioning drill that combines strength and cardio through explosive, full-body movement. Short, hard bursts make them an effective finisher for conditioning days.',
     tips: [
@@ -692,6 +826,11 @@ export const exercises: Exercise[] = [
     level: 'Beginner',
     trainingType: 'Mobility',
     type: 'Cardio',
+    pattern: 'Mobility / Active Recovery',
+    purpose: 'Improve joint range of motion and support recovery between hard sessions.',
+    strengthBenefit: 'Not a strength builder — it maintains the range of motion strength training relies on.',
+    hypertrophyBenefit: "No meaningful size impact; it's designed for recovery, not growth.",
+    quickFact: 'Moving with your breath instead of rushing the pace is what makes it feel restorative rather than taxing.',
     description:
       'The mobility flow is a light, continuous movement sequence that improves joint range of motion and supports recovery between harder training days. It’s designed to be low-intensity and breath-led rather than heavily loaded.',
     tips: [

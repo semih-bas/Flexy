@@ -23,9 +23,16 @@ type PlanContextValue = {
   setPlan: Dispatch<SetStateAction<DayPlan[]>>;
   applyTemplate: (template: WorkoutTemplate) => void;
   resetPlan: () => void;
+  activePlanName: string;
+  // Aktif plan bir favoriden geldiyse veya favoriye kaydedildiyse o favorinin id'sini tutar;
+  // bağ yoksa null (aktif plan ve favoriler birbirinden bağımsız çalışır).
+  activeFavoriteId: string | null;
+  renameActivePlan: (name: string) => void;
+  saveActivePlanAsFavorite: (name: string) => void;
   favoritePlans: FavoritePlan[];
   saveFavoritePlan: (name: string, week: DayPlan[]) => void;
   applyFavoritePlan: (favoritePlan: FavoritePlan) => void;
+  renameFavoritePlan: (id: string, name: string) => void;
   deleteFavoritePlan: (id: string) => void;
   clearFavoritePlans: () => void;
 };
@@ -39,20 +46,59 @@ const PlanContext = createContext<PlanContextValue | null>(null);
 // okuyup güncelleyebilir.
 export function PlanProvider({ children }: { children: ReactNode }) {
   const [plan, setPlan] = useState<DayPlan[]>(mockWeekPlan);
+  const [activePlanName, setActivePlanName] = useState('Weekly Workout Plan');
+  const [activeFavoriteId, setActiveFavoriteId] = useState<string | null>(null);
   const [favoritePlans, setFavoritePlans] = useState<FavoritePlan[]>([]);
 
+  // Bir şablon uygulamak aktif planı favori bağından koparır: artık hiçbir kayıtlı favorinin
+  // birebir kopyası değil, bağımsız bir plan.
   function applyTemplate(template: WorkoutTemplate) {
     setPlan(buildWeekFromTemplate(template));
+    setActiveFavoriteId(null);
   }
 
   // Settings > Danger zone > Reset weekly plan: haftayı tamamen boş (rest day) hale getirir.
   function resetPlan() {
     setPlan(WEEKDAYS.map((day) => ({ day, workoutName: null, exercises: [] })));
+    setActiveFavoriteId(null);
+  }
+
+  // Dashboard'daki plan adı düzenlendiğinde çağrılır. Aktif plan bir favoriye bağlıysa o
+  // favorinin adı da aynı anda güncellenir (tek yönlü değil, iki yönlü senkron).
+  function renameActivePlan(name: string) {
+    const trimmed = name.trim() || 'My Plan';
+    setActivePlanName(trimmed);
+    if (activeFavoriteId) {
+      setFavoritePlans((prev) =>
+        prev.map((favorite) => (favorite.id === activeFavoriteId ? { ...favorite, name: trimmed } : favorite)),
+      );
+    }
+  }
+
+  // Dashboard'daki "Save as favorite" butonu: aktif plan zaten bir favoriye bağlıysa doğrudan o
+  // favoriyi günceller (id üzerinden); bağlı değilse aynı adla favori olup olmadığına bakmak
+  // arayüzün işi (bkz. WeeklyPlanBoard) — burada verilen ad neyse ona göre yeni favori oluşturur
+  // veya üzerine yazar ve bağı kurar.
+  function saveActivePlanAsFavorite(name: string) {
+    const trimmedName = name.trim() || 'My Plan';
+    const targetIndex = activeFavoriteId
+      ? favoritePlans.findIndex((favorite) => favorite.id === activeFavoriteId)
+      : favoritePlans.findIndex((favorite) => favorite.name.trim().toLowerCase() === trimmedName.toLowerCase());
+    const id = targetIndex === -1 ? crypto.randomUUID() : favoritePlans[targetIndex].id;
+    const entry: FavoritePlan = { id, name: trimmedName, savedAt: new Date().toISOString(), week: copyWeek(plan) };
+
+    setFavoritePlans((prev) => {
+      const index = prev.findIndex((favorite) => favorite.id === id);
+      if (index === -1) return [entry, ...prev];
+      return prev.map((favorite, i) => (i === index ? entry : favorite));
+    });
+    setActivePlanName(trimmedName);
+    setActiveFavoriteId(id);
   }
 
   // Aynı adla kayıtlı favori varsa üzerine yazar (aynı id korunur); yoksa listenin başına yeni
-  // favori eklenir. Aynı ada sahip favori olup olmadığını önceden sorup sormama kararı arayüz
-  // tarafında verilir (bkz. WeeklyPlanBoard) — bu fonksiyon her zaman doğrudan kaydeder.
+  // favori eklenir. Bu, Templates > "Save to My Plans" gibi aktif planı etkilemeyen genel bir
+  // kaydetme işlemidir — activeFavoriteId'yi değiştirmez.
   function saveFavoritePlan(name: string, week: DayPlan[]) {
     const trimmedName = name.trim() || 'My Plan';
 
@@ -72,17 +118,36 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  // My Plans / Templates > Apply: favoriyi aktif plana uygular ve bağı kurar.
   function applyFavoritePlan(favoritePlan: FavoritePlan) {
     setPlan(copyWeek(favoritePlan.week));
+    setActivePlanName(favoritePlan.name);
+    setActiveFavoriteId(favoritePlan.id);
+  }
+
+  // My Plans kartındaki kalem ikonu: favori adını değiştirir; bu favori şu an aktif plana
+  // bağlıysa aktif plan adı da senkron kalsın diye güncellenir.
+  function renameFavoritePlan(id: string, name: string) {
+    const trimmed = name.trim() || 'My Plan';
+    setFavoritePlans((prev) =>
+      prev.map((favorite) => (favorite.id === id ? { ...favorite, name: trimmed } : favorite)),
+    );
+    if (activeFavoriteId === id) {
+      setActivePlanName(trimmed);
+    }
   }
 
   function deleteFavoritePlan(id: string) {
     setFavoritePlans((prev) => prev.filter((favorite) => favorite.id !== id));
+    if (activeFavoriteId === id) {
+      setActiveFavoriteId(null);
+    }
   }
 
   // Settings > Danger zone > Clear favorite plans.
   function clearFavoritePlans() {
     setFavoritePlans([]);
+    setActiveFavoriteId(null);
   }
 
   return (
@@ -92,9 +157,14 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         setPlan,
         applyTemplate,
         resetPlan,
+        activePlanName,
+        activeFavoriteId,
+        renameActivePlan,
+        saveActivePlanAsFavorite,
         favoritePlans,
         saveFavoritePlan,
         applyFavoritePlan,
+        renameFavoritePlan,
         deleteFavoritePlan,
         clearFavoritePlans,
       }}

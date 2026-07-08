@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "Flexy — Weekly Workout Planner",
   description: "Plan and track your weekly workouts with Flexy.",
   icons: {
-    icon: "/brand/logo.png",
+    icon: "/brand/logo-mark.png",
   },
 };
 

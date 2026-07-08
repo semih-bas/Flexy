@@ -12,7 +12,13 @@ export default function Footer() {
     <footer className="border-t border-foreground-muted/10 bg-background">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
         <div className="flex items-center gap-3">
-          <Image src="/brand/logo.png" alt="Flexy" width={168} height={94} className="h-7 w-auto" />
+          <Image
+            src="/brand/logo-transparent.png"
+            alt="Flexy"
+            width={1221}
+            height={320}
+            className="h-6 w-auto"
+          />
           <p className="text-sm text-foreground-muted">Plan your workout week.</p>
         </div>
 

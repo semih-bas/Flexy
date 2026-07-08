@@ -100,7 +100,13 @@ export default function AppSidebar() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div>
-                <Image src="/brand/logo.png" alt="Flexy" width={168} height={94} className="h-8 w-auto" />
+                <Image
+                  src="/brand/logo-transparent.png"
+                  alt="Flexy"
+                  width={1221}
+                  height={320}
+                  className="h-7 w-auto"
+                />
                 <p className="mt-1 text-xs uppercase tracking-[0.35em] text-foreground-muted">
                   Training Hub
                 </p>

@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import type { FavoritePlan } from './PlanProvider';
 import { surfaceGlowSoft } from '@/lib/surfaceStyles';
 
@@ -6,9 +9,12 @@ type MyPlanCardProps = {
   onPreview: () => void;
   onApply: () => void;
   onDelete: () => void;
+  onRename: (name: string) => void;
 };
 
-export default function MyPlanCard({ plan, onPreview, onApply, onDelete }: MyPlanCardProps) {
+export default function MyPlanCard({ plan, onPreview, onApply, onDelete, onRename }: MyPlanCardProps) {
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState(plan.name);
   const trainingDays = plan.week.filter((day) => day.workoutName && day.exercises.length > 0);
   const savedDate = new Date(plan.savedAt).toLocaleDateString('en-US', {
     month: 'short',
@@ -16,12 +22,59 @@ export default function MyPlanCard({ plan, onPreview, onApply, onDelete }: MyPla
     year: 'numeric',
   });
 
+  function startEditingName() {
+    setNameDraft(plan.name);
+    setIsEditingName(true);
+  }
+
+  function commitNameEdit() {
+    onRename(nameDraft);
+    setIsEditingName(false);
+  }
+
   return (
     <div className={`flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised ${surfaceGlowSoft}`}>
       <div className="h-1 w-full bg-brand" />
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="truncate text-xl font-extrabold leading-tight text-foreground">{plan.name}</h3>
+        {isEditingName ? (
+          <input
+            autoFocus
+            value={nameDraft}
+            onChange={(event) => setNameDraft(event.target.value)}
+            onBlur={commitNameEdit}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.currentTarget.blur();
+              }
+            }}
+            aria-label="Plan name"
+            className="w-full rounded-md border border-brand/40 bg-background px-2 py-0.5 text-xl font-extrabold text-foreground outline-none"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={startEditingName}
+            aria-label="Edit plan name"
+            className="flex items-center gap-1.5 text-left"
+          >
+            <h3 className="truncate text-xl font-extrabold leading-tight text-foreground">{plan.name}</h3>
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3.5 w-3.5 shrink-0 text-foreground-muted"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
+              <path
+                d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+
         <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-foreground-muted">
           Saved {savedDate} · {trainingDays.length} workout day{trainingDays.length === 1 ? '' : 's'}
         </p>

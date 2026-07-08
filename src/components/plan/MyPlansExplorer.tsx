@@ -18,7 +18,7 @@ function formatSavedDate(savedAt: string) {
 
 export default function MyPlansExplorer() {
   const router = useRouter();
-  const { favoritePlans, applyFavoritePlan, deleteFavoritePlan } = usePlan();
+  const { favoritePlans, applyFavoritePlan, renameFavoritePlan, deleteFavoritePlan } = usePlan();
   const [previewingPlan, setPreviewingPlan] = useState<FavoritePlan | null>(null);
   const [applyingPlan, setApplyingPlan] = useState<FavoritePlan | null>(null);
   const [deletingPlan, setDeletingPlan] = useState<FavoritePlan | null>(null);
@@ -68,6 +68,7 @@ export default function MyPlansExplorer() {
             onPreview={() => setPreviewingPlan(plan)}
             onApply={() => setApplyingPlan(plan)}
             onDelete={() => setDeletingPlan(plan)}
+            onRename={(name) => renameFavoritePlan(plan.id, name)}
           />
         ))}
       </div>
