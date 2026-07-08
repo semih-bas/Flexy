@@ -1,7 +1,7 @@
 import type { DayPlan } from '@/data/mockPlan';
 import type { WorkoutTemplate } from '@/data/workoutTemplates';
 
-const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+export const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 // Şablonun antrenman günleri haftaya bu sırayla yerleştirilir; kalan günler Rest Day olur.
 // Örn. 4 gün/hafta bir şablon Pazartesi/Salı/Perşembe/Cuma'ya oturur, Çarşamba/Cumartesi/Pazar boş kalır.

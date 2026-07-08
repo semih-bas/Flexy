@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { mockWeekPlan, type DayPlan } from '@/data/mockPlan';
 import type { WorkoutTemplate } from '@/data/workoutTemplates';
-import { buildWeekFromTemplate } from '@/lib/applyTemplate';
+import { buildWeekFromTemplate, WEEKDAYS } from '@/lib/applyTemplate';
 
 // TODO: Faz 3'te backend/veritabanı gelince favoritePlans kalıcı hale gelecek (şimdilik
 // sadece hafızada tutulur, sayfa yenilenince kaybolur).
@@ -22,10 +22,12 @@ type PlanContextValue = {
   plan: DayPlan[];
   setPlan: Dispatch<SetStateAction<DayPlan[]>>;
   applyTemplate: (template: WorkoutTemplate) => void;
+  resetPlan: () => void;
   favoritePlans: FavoritePlan[];
   saveFavoritePlan: (name: string, week: DayPlan[]) => void;
   applyFavoritePlan: (favoritePlan: FavoritePlan) => void;
   deleteFavoritePlan: (id: string) => void;
+  clearFavoritePlans: () => void;
 };
 
 const PlanContext = createContext<PlanContextValue | null>(null);
@@ -41,6 +43,11 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   function applyTemplate(template: WorkoutTemplate) {
     setPlan(buildWeekFromTemplate(template));
+  }
+
+  // Settings > Danger zone > Reset weekly plan: haftayı tamamen boş (rest day) hale getirir.
+  function resetPlan() {
+    setPlan(WEEKDAYS.map((day) => ({ day, workoutName: null, exercises: [] })));
   }
 
   // Aynı adla kayıtlı favori varsa üzerine yazar (aynı id korunur); yoksa listenin başına yeni
@@ -73,9 +80,24 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     setFavoritePlans((prev) => prev.filter((favorite) => favorite.id !== id));
   }
 
+  // Settings > Danger zone > Clear favorite plans.
+  function clearFavoritePlans() {
+    setFavoritePlans([]);
+  }
+
   return (
     <PlanContext.Provider
-      value={{ plan, setPlan, applyTemplate, favoritePlans, saveFavoritePlan, applyFavoritePlan, deleteFavoritePlan }}
+      value={{
+        plan,
+        setPlan,
+        applyTemplate,
+        resetPlan,
+        favoritePlans,
+        saveFavoritePlan,
+        applyFavoritePlan,
+        deleteFavoritePlan,
+        clearFavoritePlans,
+      }}
     >
       {children}
     </PlanContext.Provider>
