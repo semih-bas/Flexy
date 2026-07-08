@@ -1,6 +1,5 @@
 import AppSidebar from "@/components/layout/AppSidebar";
 import WeeklyPlanBoard from "@/components/dashboard/WeeklyPlanBoard";
-import { mockWeekPlan } from "@/data/mockPlan";
 
 export default function DashboardPage() {
   return (
@@ -22,7 +21,7 @@ export default function DashboardPage() {
           </p>
         </header>
 
-        <WeeklyPlanBoard initialPlan={mockWeekPlan} />
+        <WeeklyPlanBoard />
       </section>
     </main>
   );

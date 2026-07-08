@@ -14,6 +14,7 @@ import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSo
 import type { DayPlan, PlanExercise } from "@/data/mockPlan";
 import { getMuscleGroupColor } from "@/lib/muscleGroupColor";
 import { surfaceGlow, surfaceGlowSoft } from "@/lib/surfaceStyles";
+import { usePlan } from "@/components/plan/PlanProvider";
 import WorkoutEditorModal from "./WorkoutEditorModal";
 import SortableRow from "./SortableRow";
 
@@ -92,13 +93,9 @@ function groupByMuscle(exercises: PlanExercise[]) {
   return groups;
 }
 
-type WeeklyPlanBoardProps = {
-  initialPlan: DayPlan[];
-};
-
-export default function WeeklyPlanBoard({ initialPlan }: WeeklyPlanBoardProps) {
+export default function WeeklyPlanBoard() {
   const todayName = getTodayDayName();
-  const [plan, setPlan] = useState(initialPlan);
+  const { plan, setPlan } = usePlan();
   const [selectedDay, setSelectedDay] = useState(
     () => plan.find((entry) => entry.day === todayName)?.day ?? plan[0].day,
   );

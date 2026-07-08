@@ -1,0 +1,150 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import AppSidebar from '@/components/layout/AppSidebar';
+import { exercises } from '@/data/exercises';
+import { surfaceGlow, surfaceGlowSoft } from '@/lib/surfaceStyles';
+
+type ExerciseDetailPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+// Build sırasında 25 egzersizin tamamı için statik HTML üretilir (SSG): sayfa her istekte
+// yeniden render edilmek yerine önceden hazırlanır, bu da açılışı anında ve sunucu yükünü sıfıra
+// yakın yapar. Veri her build'de sabit olduğu için (henüz backend yok) bu ideal bir kullanım.
+export function generateStaticParams() {
+  return exercises.map((exercise) => ({ id: exercise.id }));
+}
+
+export default async function ExerciseDetailPage({ params }: ExerciseDetailPageProps) {
+  const { id } = await params;
+  const exercise = exercises.find((entry) => entry.id === id);
+
+  if (!exercise) {
+    notFound();
+  }
+
+  const targetMuscles = [...exercise.primaryMuscles, ...exercise.secondaryMuscles];
+
+  return (
+    <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <AppSidebar />
+
+      <section className="relative z-10 mx-auto flex w-full max-w-5xl flex-col px-3 py-6 sm:px-5 lg:px-6 lg:py-8">
+        <Link
+          href="/exercises"
+          className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-foreground-muted transition hover:text-brand"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Exercise Library
+        </Link>
+
+        <div className={`mt-4 overflow-hidden rounded-3xl bg-surface ${surfaceGlow}`}>
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            <div className="relative aspect-[4/3] w-full shrink-0 bg-background lg:aspect-auto lg:min-h-[22rem]">
+              {exercise.image ? (
+                <Image
+                  src={exercise.image}
+                  alt={exercise.name}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-raised to-background">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-16 w-16 text-brand/30"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
+                  >
+                    <path d="M5 9v6M3 10v4M19 9v6M21 10v4M7 12h10" strokeLinecap="round" strokeLinejoin="round" />
+                    <rect x="5" y="7" width="2.4" height="10" rx="1" />
+                    <rect x="16.6" y="7" width="2.4" height="10" rx="1" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-4 p-5 sm:p-7 lg:p-9">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-brand/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.25em] text-brand">
+                  {exercise.category}
+                </span>
+                <span className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground-muted">
+                  {exercise.type}
+                </span>
+              </div>
+
+              <h1 className="text-2xl font-bold leading-tight sm:text-3xl">{exercise.name}</h1>
+
+              <p className="text-sm leading-6 text-foreground-muted sm:text-base">{exercise.description}</p>
+
+              <div className="mt-auto flex w-fit items-center gap-2 rounded-2xl border border-border bg-background px-4 py-3 text-sm">
+                <span className="font-semibold uppercase tracking-[0.15em] text-foreground-muted">Default</span>
+                <span className="font-bold text-brand">
+                  {exercise.defaultSets}x{exercise.defaultReps}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <div className={`rounded-3xl bg-surface p-5 sm:p-6 ${surfaceGlowSoft}`}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand">Target Muscles</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {targetMuscles.map((muscle) => (
+                <span
+                  key={muscle}
+                  className="rounded-full bg-background px-3 py-1.5 text-xs font-semibold text-foreground-muted"
+                >
+                  {muscle}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className={`rounded-3xl bg-surface p-5 sm:p-6 ${surfaceGlowSoft}`}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand">Form Tips</p>
+            <ol className="mt-3 space-y-2.5">
+              {exercise.tips.map((tip, index) => (
+                <li key={tip} className="flex items-start gap-3 text-sm text-foreground">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand/15 text-xs font-bold text-brand">
+                    {index + 1}
+                  </span>
+                  <span className="pt-0.5 leading-6">{tip}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-3xl border border-danger/25 bg-danger/[0.06] p-5 sm:p-6">
+          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] text-danger">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path
+                d="M12 9v4m0 3.5h.01M10.3 3.9 2.6 17.4a1.6 1.6 0 0 0 1.4 2.4h16a1.6 1.6 0 0 0 1.4-2.4L13.7 3.9a1.6 1.6 0 0 0-2.8 0Z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Common Mistakes
+          </p>
+          <ul className="mt-3 space-y-2">
+            {exercise.commonMistakes.map((mistake) => (
+              <li key={mistake} className="flex items-start gap-3 text-sm text-foreground-muted">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-danger" />
+                <span>{mistake}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </main>
+  );
+}

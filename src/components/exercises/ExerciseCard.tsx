@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Exercise } from '@/data/exercises';
 import { surfaceGlowSoft } from '@/lib/surfaceStyles';
 
@@ -6,11 +7,14 @@ type ExerciseCardProps = {
   exercise: Exercise;
 };
 
-// Bu kart tıklanabilir değil: detay sayfası (/exercises/[id]) yol haritasında sonraki adım.
-// O sayfa açılana kadar View butonu düz button kalır (Link'e bağlanmaz).
+// Kartın tamamı ve View "butonu" aynı Link'i paylaşır: iç içe interaktif eleman (link içinde
+// button) olmaması için View görsel olarak buton ama gerçekte span'dir.
 export default function ExerciseCard({ exercise }: ExerciseCardProps) {
   return (
-    <article className={`flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised ${surfaceGlowSoft}`}>
+    <Link
+      href={`/exercises/${exercise.id}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised transition hover:border-brand/30 ${surfaceGlowSoft}`}
+    >
       <div className="relative aspect-[4/3] w-full shrink-0 bg-background">
         {exercise.image ? (
           <Image
@@ -55,13 +59,10 @@ export default function ExerciseCard({ exercise }: ExerciseCardProps) {
           </span>
         </div>
 
-        <button
-          type="button"
-          className="w-full rounded-xl border border-border py-2 text-sm font-semibold text-foreground-muted transition hover:border-brand/60 hover:text-brand"
-        >
+        <span className="block w-full rounded-xl border border-border py-2 text-center text-sm font-semibold text-foreground-muted transition group-hover:border-brand/60 group-hover:text-brand">
           View
-        </button>
+        </span>
       </div>
-    </article>
+    </Link>
   );
 }
