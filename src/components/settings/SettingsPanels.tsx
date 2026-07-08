@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { useSettings, type WeekStartDay, type WeightUnit } from './SettingsProvider';
+import { useSettings, type Language, type WeekStartDay, type WeightUnit } from './SettingsProvider';
 import { usePlan } from '@/components/plan/PlanProvider';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { surfaceGlowSoft } from '@/lib/surfaceStyles';
@@ -68,7 +68,16 @@ function SettingsCard({
 }
 
 export default function SettingsPanels() {
-  const { userName, setUserName, weekStartDay, setWeekStartDay, weightUnit, setWeightUnit } = useSettings();
+  const {
+    userName,
+    setUserName,
+    weekStartDay,
+    setWeekStartDay,
+    weightUnit,
+    setWeightUnit,
+    language,
+    setLanguage,
+  } = useSettings();
   const { resetPlan, clearFavoritePlans } = usePlan();
   const [confirmingReset, setConfirmingReset] = useState(false);
   const [confirmingClear, setConfirmingClear] = useState(false);
@@ -121,6 +130,23 @@ export default function SettingsPanels() {
                 options={[
                   { value: 'kg', label: 'kg' },
                   { value: 'lb', label: 'lb' },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-foreground-muted">
+              Language
+            </p>
+            <div className="mt-2">
+              <SegmentedToggle<Language>
+                value={language}
+                onChange={setLanguage}
+                ariaLabel="Language"
+                options={[
+                  { value: 'EN', label: 'EN' },
+                  { value: 'TR', label: 'TR' },
                 ]}
               />
             </div>

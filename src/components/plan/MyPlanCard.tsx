@@ -21,12 +21,9 @@ export default function MyPlanCard({ plan, onPreview, onApply, onDelete }: MyPla
       <div className="h-1 w-full bg-brand" />
 
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground-muted">
-          Saved {savedDate}
-        </p>
-        <h3 className="mt-2 text-lg font-bold leading-tight text-foreground">{plan.name}</h3>
-        <p className="mt-1 text-xs font-semibold text-foreground-muted">
-          {trainingDays.length} workout day{trainingDays.length === 1 ? '' : 's'}
+        <h3 className="truncate text-xl font-extrabold leading-tight text-foreground">{plan.name}</h3>
+        <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-foreground-muted">
+          Saved {savedDate} · {trainingDays.length} workout day{trainingDays.length === 1 ? '' : 's'}
         </p>
 
         <div className="mt-3 flex flex-1 flex-wrap items-start gap-2">

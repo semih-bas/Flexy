@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { surfaceGlow } from '@/lib/surfaceStyles';
+import StoreButton from './StoreButton';
 
 const heroStats = [
   { value: '7-Day', label: 'Planning' },
@@ -140,45 +140,62 @@ export default function HeroSection() {
           </div>
 
           <div className="order-1 lg:order-2 lg:flex-1">
-            <div className="relative mx-auto max-w-sm">
-              <div aria-hidden className="absolute -inset-4 rounded-[2.5rem] bg-brand/15 blur-3xl" />
+            {/* CSS ile çizilen telefon çerçevesi: gerçek fotoğraf mockup yok, sınır+notch+home
+                indicator ile telefon hissi veriliyor, içi mini dashboard önizlemesi. */}
+            <div className="relative mx-auto w-full max-w-[280px]">
+              <div aria-hidden className="absolute -inset-6 rounded-[3rem] bg-brand/15 blur-3xl" />
 
-              <div
-                className={`relative -rotate-2 rounded-3xl bg-surface-raised p-6 shadow-2xl shadow-black/40 ${surfaceGlow}`}
-              >
-                <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand">This Week</p>
+              <div className="relative rounded-[2.75rem] border-[6px] border-foreground/10 bg-[#0b0f16] p-3 shadow-2xl shadow-black/50">
+                <div
+                  aria-hidden
+                  className="absolute left-1/2 top-3 h-5 w-24 -translate-x-1/2 rounded-full bg-foreground/10"
+                />
 
-                <div className="mt-3 grid grid-cols-7 gap-1.5">
-                  {miniWeek.map((entry) => (
-                    <div key={entry.day} className="flex flex-col items-center gap-1.5">
-                      <span className="text-[10px] font-semibold text-foreground-muted">{entry.day}</span>
-                      <span
-                        className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${miniDayStyles[entry.status]}`}
-                      >
-                        {entry.status === 'completed' ? '✓' : ''}
-                      </span>
+                <div className="overflow-hidden rounded-[2rem] bg-surface-raised px-4 pb-5 pt-9">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand">Your Week</p>
+
+                  <div className="mt-3 grid grid-cols-7 gap-1">
+                    {miniWeek.map((entry) => (
+                      <div key={entry.day} className="flex flex-col items-center gap-1">
+                        <span className="text-[9px] font-semibold text-foreground-muted">{entry.day}</span>
+                        <span
+                          className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${miniDayStyles[entry.status]}`}
+                        >
+                          {entry.status === 'completed' ? '✓' : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 border-t border-border pt-3">
+                    <div className="flex items-center justify-between text-[11px] font-semibold">
+                      <span className="uppercase tracking-[0.15em] text-foreground-muted">Progress</span>
+                      <span className="text-foreground">68%</span>
                     </div>
-                  ))}
+                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-background">
+                      <div className="h-full w-[68%] rounded-full bg-brand" />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl bg-background p-3.5">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand">Today</p>
+                    <h3 className="mt-1 text-sm font-bold text-foreground">Chest &amp; Triceps</h3>
+                    <p className="mt-1 text-[11px] leading-4 text-foreground-muted">
+                      Bench Press · Incline Press · Cable Fly
+                    </p>
+                  </div>
                 </div>
 
-                <div className="mt-5 border-t border-border pt-4">
-                  <div className="flex items-center justify-between text-xs font-semibold">
-                    <span className="uppercase tracking-[0.2em] text-foreground-muted">Weekly Progress</span>
-                    <span className="text-foreground">68%</span>
-                  </div>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-background">
-                    <div className="h-full w-[68%] rounded-full bg-brand" />
-                  </div>
-                </div>
-
-                <div className="mt-5 rounded-2xl bg-background p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand">Today</p>
-                  <h3 className="mt-1 text-base font-bold text-foreground">Chest &amp; Triceps</h3>
-                  <p className="mt-1 text-xs text-foreground-muted">
-                    Bench Press · Incline Press · Cable Fly
-                  </p>
-                </div>
+                <div
+                  aria-hidden
+                  className="absolute bottom-2 left-1/2 h-1 w-20 -translate-x-1/2 rounded-full bg-foreground/15"
+                />
               </div>
+            </div>
+
+            <div className="mx-auto mt-6 flex max-w-[280px] flex-col gap-2.5">
+              <StoreButton storeName="App Store" label="Coming soon" />
+              <StoreButton storeName="Google Play" label="Coming soon" />
             </div>
           </div>
         </div>

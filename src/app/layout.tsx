@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Flexy — Weekly Workout Planner",
   description: "Plan and track your weekly workouts with Flexy.",
+  icons: {
+    icon: "/brand/logo.png",
+  },
 };
 
 export default function RootLayout({

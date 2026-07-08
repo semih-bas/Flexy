@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
@@ -98,12 +99,11 @@ export default function AppSidebar() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand shadow-lg shadow-brand/20">
-                <span className="text-lg font-semibold tracking-[0.2em] text-white">F</span>
-              </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-foreground-muted">Flexy</p>
-                <h2 className="text-base font-semibold text-foreground">Training Hub</h2>
+                <Image src="/brand/logo.png" alt="Flexy" width={168} height={94} className="h-8 w-auto" />
+                <p className="mt-1 text-xs uppercase tracking-[0.35em] text-foreground-muted">
+                  Training Hub
+                </p>
               </div>
             </div>
 

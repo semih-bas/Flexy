@@ -15,6 +15,7 @@ import type { DayPlan, PlanExercise } from "@/data/mockPlan";
 import { getMuscleGroupColor } from "@/lib/muscleGroupColor";
 import { surfaceGlow, surfaceGlowSoft } from "@/lib/surfaceStyles";
 import { usePlan } from "@/components/plan/PlanProvider";
+import { useSettings, type WeekStartDay } from "@/components/settings/SettingsProvider";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import WorkoutEditorModal from "./WorkoutEditorModal";
 import SortableRow from "./SortableRow";
@@ -64,17 +65,28 @@ function getStatus(day: DayPlan, temporal: Temporal): DayStatus | null {
   return "partial";
 }
 
-// Aksiyon butonu (Edit/Add Workout) rengi zamana göre değişir; özel işlev kısıtlaması yok, sadece görünüm ipucu.
-function getActionButtonClasses(temporal: Temporal, isRestDay: boolean) {
+// Aksiyon butonu (Edit/Add Workout) hiçbir zaman fonksiyonel olarak devre dışı bırakılmaz —
+// geçmiş günler de düzenlenebilir, gelecek günler de. Renk sadece zamana göre değişen bir ipucu:
+// bugün dolgun turuncu, geçmiş soluk turuncu (hover'da tam turuncu), gelecek her zaman normal
+// turuncu-outline (workout olsa da olmasa da aynı, asla pasif görünmez).
+function getActionButtonClasses(temporal: Temporal) {
   if (temporal === "today") {
     return "bg-brand text-white shadow-md shadow-brand/25";
   }
   if (temporal === "past") {
-    return "border border-border/40 text-foreground-muted/50";
+    return "border border-brand/30 text-brand/60 hover:border-brand hover:text-brand";
   }
-  return isRestDay
-    ? "border border-brand/35 text-brand"
-    : "border border-border text-foreground-muted";
+  return "border border-brand/35 text-brand";
+}
+
+// Haftalık grid'in ilk günü Settings > Preferences > "Week starts on" tercihine göre döner;
+// alttaki plan state'i her zaman Monday..Sunday sırasıyla saklanır (diğer sayfalar/işlevler bu
+// sıraya güvenir), bu sadece dashboard'daki görüntüleme sırasını değiştiren türetilmiş bir görünüm.
+function orderByWeekStart(week: DayPlan[], weekStartDay: WeekStartDay): DayPlan[] {
+  if (weekStartDay === "Monday") return week;
+  const startIndex = week.findIndex((entry) => entry.day === "Sunday");
+  if (startIndex === -1) return week;
+  return [...week.slice(startIndex), ...week.slice(0, startIndex)];
 }
 
 function groupByMuscle(exercises: PlanExercise[]) {
@@ -97,8 +109,10 @@ function groupByMuscle(exercises: PlanExercise[]) {
 export default function WeeklyPlanBoard() {
   const todayName = getTodayDayName();
   const { plan, setPlan, favoritePlans, saveFavoritePlan } = usePlan();
+  const { weekStartDay } = useSettings();
+  const displayPlan = orderByWeekStart(plan, weekStartDay);
   const [selectedDay, setSelectedDay] = useState(
-    () => plan.find((entry) => entry.day === todayName)?.day ?? plan[0].day,
+    () => plan.find((entry) => entry.day === todayName)?.day ?? displayPlan[0].day,
   );
   const [planName, setPlanName] = useState("Weekly Workout Plan");
   const [isEditingName, setIsEditingName] = useState(false);
@@ -106,8 +120,13 @@ export default function WeeklyPlanBoard() {
   const [editingDay, setEditingDay] = useState<string | null>(null);
   const [confirmingOverwrite, setConfirmingOverwrite] = useState(false);
 
-  const todayIndex = plan.findIndex((entry) => entry.day === todayName);
+  const todayIndex = displayPlan.findIndex((entry) => entry.day === todayName);
   const selectedPlan = plan.find((entry) => entry.day === selectedDay) ?? plan[0];
+  const selectedDisplayIndex = displayPlan.findIndex((entry) => entry.day === selectedPlan.day);
+  const selectedTemporal: Temporal =
+    selectedPlan.day === todayName ? "today" : selectedDisplayIndex < todayIndex ? "past" : "future";
+  // Gelecek günlerin egzersizleri tik atılamaz kilitli görünür: sadece bugün ve geçmiş işaretlenebilir.
+  const isSelectedLocked = selectedTemporal === "future";
   const selectedGroups = groupByMuscle(selectedPlan.exercises);
   const selectedCounts = getCounts(selectedPlan);
 
@@ -265,7 +284,7 @@ export default function WeeklyPlanBoard() {
         </div>
 
         <div className="mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:min-h-0 lg:grid-cols-4 lg:grid-rows-2">
-          {plan.map((entry, index) => {
+          {displayPlan.map((entry, index) => {
             const { total, completed } = getCounts(entry);
             const temporal: Temporal =
               entry.day === todayName ? "today" : index < todayIndex ? "past" : "future";
@@ -314,7 +333,7 @@ export default function WeeklyPlanBoard() {
                       {completed}/{total} exercises
                     </p>
 
-                    <div className="mt-1 flex min-h-0 flex-1 flex-col justify-center space-y-0.5 overflow-hidden">
+                    <div className="mt-1 flex min-h-0 flex-1 flex-col justify-start space-y-0.5 overflow-hidden">
                       {entry.exercises.slice(0, MAX_VISIBLE_EXERCISES).map((exercise) => (
                         <div
                           key={exercise.name}
@@ -343,9 +362,8 @@ export default function WeeklyPlanBoard() {
                         setEditingDay(entry.day);
                       }}
                       aria-label={`Edit workout for ${entry.day}`}
-                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1.5 text-center text-sm font-semibold leading-tight ${getActionButtonClasses(
+                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1.5 text-center text-sm font-semibold leading-tight transition ${getActionButtonClasses(
                         temporal,
-                        false,
                       )}`}
                     >
                       Edit
@@ -385,9 +403,8 @@ export default function WeeklyPlanBoard() {
                         setEditingDay(entry.day);
                       }}
                       aria-label={`Add workout for ${entry.day}`}
-                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1.5 text-center text-sm font-semibold leading-tight ${getActionButtonClasses(
+                      className={`mt-1.5 block w-full shrink-0 rounded-lg px-4 py-1.5 text-center text-sm font-semibold leading-tight transition ${getActionButtonClasses(
                         temporal,
-                        true,
                       )}`}
                     >
                       Add Workout
@@ -437,17 +454,28 @@ export default function WeeklyPlanBoard() {
                         <SortableRow key={exercise.name} id={exercise.name}>
                           {({ attributes, listeners }) => (
                             <div
-                              role="button"
-                              tabIndex={0}
-                              aria-pressed={exercise.completed}
-                              onClick={() => toggleExercise(selectedPlan.day, exercise.name)}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
-                                  event.preventDefault();
-                                  toggleExercise(selectedPlan.day, exercise.name);
-                                }
-                              }}
-                              className={`flex w-full items-center gap-2 rounded-xl bg-surface-raised px-3 py-2 ${surfaceGlowSoft} shadow-md shadow-black/15`}
+                              role={isSelectedLocked ? undefined : "button"}
+                              tabIndex={isSelectedLocked ? -1 : 0}
+                              aria-pressed={isSelectedLocked ? undefined : exercise.completed}
+                              aria-disabled={isSelectedLocked || undefined}
+                              onClick={
+                                isSelectedLocked
+                                  ? undefined
+                                  : () => toggleExercise(selectedPlan.day, exercise.name)
+                              }
+                              onKeyDown={
+                                isSelectedLocked
+                                  ? undefined
+                                  : (event) => {
+                                      if (event.key === "Enter" || event.key === " ") {
+                                        event.preventDefault();
+                                        toggleExercise(selectedPlan.day, exercise.name);
+                                      }
+                                    }
+                              }
+                              className={`flex w-full items-center gap-2 rounded-xl bg-surface-raised px-3 py-2 ${surfaceGlowSoft} shadow-md shadow-black/15 ${
+                                isSelectedLocked ? "cursor-default opacity-60" : ""
+                              }`}
                             >
                               <span
                                 {...attributes}

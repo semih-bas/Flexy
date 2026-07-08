@@ -6,9 +6,18 @@ import type { TemplateCategory, WorkoutTemplate } from '@/data/workoutTemplates'
 import { usePlan } from '@/components/plan/PlanProvider';
 import PlanPreviewModal from '@/components/plan/PlanPreviewModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { buildWeekFromTemplate } from '@/lib/applyTemplate';
 import TemplateCard from './TemplateCard';
 
 type CategoryFilter = TemplateCategory | 'All';
+
+// "Use Plan" akışı tek bir state makinesiyle yönetilir: önce seçim (apply mi, favorilere
+// kaydetme mi), sonra seçilen yola göre onay/isim formu, en sonda "Saved" geri bildirimi.
+type UsePlanStep =
+  | { type: 'choice'; template: WorkoutTemplate }
+  | { type: 'confirmApply'; template: WorkoutTemplate }
+  | { type: 'saveForm'; template: WorkoutTemplate }
+  | { type: 'saved'; name: string };
 
 type TemplatesExplorerProps = {
   templates: WorkoutTemplate[];
@@ -17,21 +26,36 @@ type TemplatesExplorerProps = {
 
 export default function TemplatesExplorer({ templates, categories }: TemplatesExplorerProps) {
   const router = useRouter();
-  const { applyTemplate } = usePlan();
+  const { applyTemplate, saveFavoritePlan } = usePlan();
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('All');
   const [previewingTemplate, setPreviewingTemplate] = useState<WorkoutTemplate | null>(null);
-  const [confirmingTemplate, setConfirmingTemplate] = useState<WorkoutTemplate | null>(null);
+  const [usePlanStep, setUsePlanStep] = useState<UsePlanStep | null>(null);
+  const [saveNameDraft, setSaveNameDraft] = useState('');
 
   const filteredTemplates = useMemo(() => {
     if (selectedCategory === 'All') return templates;
     return templates.filter((template) => template.categories.includes(selectedCategory));
   }, [templates, selectedCategory]);
 
-  function confirmUsePlan() {
-    if (!confirmingTemplate) return;
-    applyTemplate(confirmingTemplate);
-    setConfirmingTemplate(null);
+  function openUseFlow(template: WorkoutTemplate) {
+    setUsePlanStep({ type: 'choice', template });
+  }
+
+  function confirmApplyTemplate(template: WorkoutTemplate) {
+    applyTemplate(template);
+    setUsePlanStep(null);
     router.push('/dashboard');
+  }
+
+  function openSaveForm(template: WorkoutTemplate) {
+    setSaveNameDraft(template.name);
+    setUsePlanStep({ type: 'saveForm', template });
+  }
+
+  function confirmSaveToMyPlans(template: WorkoutTemplate) {
+    const name = saveNameDraft.trim() || template.name;
+    saveFavoritePlan(name, buildWeekFromTemplate(template));
+    setUsePlanStep({ type: 'saved', name });
   }
 
   return (
@@ -87,7 +111,7 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
               key={template.id}
               template={template}
               onPreview={() => setPreviewingTemplate(template)}
-              onUse={() => setConfirmingTemplate(template)}
+              onUse={() => openUseFlow(template)}
             />
           ))}
         </div>
@@ -100,20 +124,147 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
           days={previewingTemplate.days}
           onClose={() => setPreviewingTemplate(null)}
           onUse={() => {
+            const template = previewingTemplate;
             setPreviewingTemplate(null);
-            setConfirmingTemplate(previewingTemplate);
+            openUseFlow(template);
           }}
         />
       )}
 
-      {confirmingTemplate && (
+      {usePlanStep?.type === 'choice' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close backdrop"
+            onClick={() => setUsePlanStep(null)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+          />
+
+          <div className="relative w-full max-w-sm rounded-3xl border border-foreground/10 bg-surface p-6 shadow-2xl shadow-black/40">
+            <h2 className="text-lg font-bold text-foreground">Use &ldquo;{usePlanStep.template.name}&rdquo;</h2>
+            <p className="mt-2 text-sm leading-6 text-foreground-muted">
+              Choose how you&apos;d like to use this template.
+            </p>
+
+            <div className="mt-5 space-y-2">
+              <button
+                type="button"
+                onClick={() => setUsePlanStep({ type: 'confirmApply', template: usePlanStep.template })}
+                className="w-full rounded-xl bg-brand px-4 py-3 text-left transition hover:bg-brand/90"
+              >
+                <span className="block text-sm font-semibold text-white">Apply as active plan</span>
+                <span className="block text-xs text-white/80">Overwrites your current dashboard week.</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => openSaveForm(usePlanStep.template)}
+                className="w-full rounded-xl border border-border px-4 py-3 text-left transition hover:border-brand/40"
+              >
+                <span className="block text-sm font-semibold text-foreground">Save to My Plans</span>
+                <span className="block text-xs text-foreground-muted">
+                  Adds it to your favorites without touching the dashboard.
+                </span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setUsePlanStep(null)}
+              className="mt-4 w-full rounded-xl px-4 py-2 text-center text-sm font-semibold text-foreground-muted transition hover:text-foreground"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {usePlanStep?.type === 'confirmApply' && (
         <ConfirmDialog
-          title={`Use "${confirmingTemplate.name}"?`}
+          title={`Use "${usePlanStep.template.name}"?`}
           description="This will overwrite your current weekly plan on the dashboard. This can't be undone."
           confirmLabel="Use Plan"
-          onConfirm={confirmUsePlan}
-          onCancel={() => setConfirmingTemplate(null)}
+          onConfirm={() => confirmApplyTemplate(usePlanStep.template)}
+          onCancel={() => setUsePlanStep(null)}
         />
+      )}
+
+      {usePlanStep?.type === 'saveForm' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close backdrop"
+            onClick={() => setUsePlanStep(null)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+          />
+
+          <div className="relative w-full max-w-sm rounded-3xl border border-foreground/10 bg-surface p-6 shadow-2xl shadow-black/40">
+            <h2 className="text-lg font-bold text-foreground">Save to My Plans</h2>
+            <p className="mt-2 text-sm leading-6 text-foreground-muted">
+              Give this plan a name. You can apply it from My Plans whenever you want.
+            </p>
+
+            <label className="mt-4 flex flex-col gap-1.5">
+              <span className="text-xs font-semibold uppercase tracking-[0.15em] text-foreground-muted">
+                Plan name
+              </span>
+              <input
+                autoFocus
+                type="text"
+                value={saveNameDraft}
+                onChange={(event) => setSaveNameDraft(event.target.value)}
+                aria-label="Plan name"
+                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-brand/50"
+              />
+            </label>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setUsePlanStep(null)}
+                className="rounded-xl border border-border px-4 py-2 text-sm font-semibold text-foreground-muted transition hover:border-brand/40 hover:text-foreground"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => confirmSaveToMyPlans(usePlanStep.template)}
+                className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand/25 transition hover:bg-brand/90"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {usePlanStep?.type === 'saved' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close backdrop"
+            onClick={() => setUsePlanStep(null)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+          />
+
+          <div className="relative w-full max-w-sm rounded-3xl border border-foreground/10 bg-surface p-6 text-center shadow-2xl shadow-black/40">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success/15 text-success">
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="m5 13 4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h2 className="mt-4 text-lg font-bold text-foreground">Saved to My Plans</h2>
+            <p className="mt-2 text-sm leading-6 text-foreground-muted">
+              &ldquo;{usePlanStep.name}&rdquo; is now available in My Plans.
+            </p>
+            <button
+              type="button"
+              onClick={() => setUsePlanStep(null)}
+              className="mt-5 w-full rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand/25 transition hover:bg-brand/90"
+            >
+              Done
+            </button>
+          </div>
+        </div>
       )}
     </>
   );
