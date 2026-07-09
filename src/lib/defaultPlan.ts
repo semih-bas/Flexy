@@ -1,21 +1,14 @@
-import { mockWeekPlan } from "@/data/mockPlan";
+import { WEEKDAYS } from "@/lib/applyTemplate";
 
-// Yeni kayıt olan kullanıcının aktif planı bu örnek haftayla başlar (eski mockPlan.ts verisi) —
-// tamamen boş bir haftadansa, uygulamanın nasıl kullanılacağını gösteren dolu bir örnek daha iyi
-// bir ilk deneyim. mockPlan.ts kendisi artık sadece bu varsayılanın kaynağı olarak kullanılıyor.
+// Yeni kayıt olan kullanıcının aktif planı tamamen boş bir haftayla başlar: 7 gün, hepsi
+// workoutName: null, exercises: []. Kullanıcı ilk planını kendisi oluşturur (Templates'ten
+// bir program seçerek ya da dashboard'dan manuel ekleyerek) — önceden dolu bir örnek plan
+// göstermek, henüz yapılmamış antrenmanları yapılmış gibi gösterirdi.
 export function buildDefaultPlanDays() {
-  return mockWeekPlan.map((day, dayIndex) => ({
-    day: day.day,
-    workoutName: day.workoutName,
+  return WEEKDAYS.map((day, dayIndex) => ({
+    day,
+    workoutName: null,
     sortOrder: dayIndex,
-    exercises: {
-      create: day.exercises.map((exercise, exerciseIndex) => ({
-        name: exercise.name,
-        sets: exercise.sets,
-        muscleGroup: exercise.muscleGroup ?? null,
-        completed: exercise.completed,
-        sortOrder: exerciseIndex,
-      })),
-    },
+    exercises: { create: [] },
   }));
 }

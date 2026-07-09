@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       password: passwordHash,
       plans: {
         create: {
-          name: "Weekly Workout Plan",
+          name: "My Plan",
           isActive: true,
           days: { create: buildDefaultPlanDays() },
         },

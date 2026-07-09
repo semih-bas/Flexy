@@ -1,9 +1,13 @@
 'use client';
 
 import { createContext, useContext, useEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
-import { mockWeekPlan, type DayPlan } from '@/data/mockPlan';
+import type { DayPlan } from '@/data/mockPlan';
 import type { WorkoutTemplate } from '@/data/workoutTemplates';
 import { buildWeekFromTemplate, WEEKDAYS } from '@/lib/applyTemplate';
+
+function buildEmptyWeek(): DayPlan[] {
+  return WEEKDAYS.map((day) => ({ day, workoutName: null, exercises: [] }));
+}
 
 export type FavoritePlan = {
   id: string;
@@ -57,10 +61,10 @@ const PlanContext = createContext<PlanContextValue | null>(null);
 // kullanılır. Provider ayrıca bu state'i /api/plan ve /api/plans üzerinden veritabanına bağlar:
 // açılışta fetch eder, sonraki her değişiklikte (tik, sürükleme, save workout, rename) debounce'lı
 // olarak geri yazar. Giriş yapılmamışsa (ör. landing sayfası) fetch'ler sessizce 401 döner ve
-// mockWeekPlan yerel varsayılan olarak kalır — hiçbir şey kırılmaz.
+// boş bir hafta yerel varsayılan olarak kalır — hiçbir şey kırılmaz.
 export function PlanProvider({ children }: { children: ReactNode }) {
-  const [plan, setPlan] = useState<DayPlan[]>(mockWeekPlan);
-  const [activePlanName, setActivePlanName] = useState('Weekly Workout Plan');
+  const [plan, setPlan] = useState<DayPlan[]>(buildEmptyWeek);
+  const [activePlanName, setActivePlanName] = useState('My Plan');
   const [activeFavoriteId, setActiveFavoriteId] = useState<string | null>(null);
   const [favoritePlans, setFavoritePlans] = useState<FavoritePlan[]>([]);
 

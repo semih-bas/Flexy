@@ -16,7 +16,7 @@ async function getOrCreateActivePlan(userId: string) {
   return prisma.plan.create({
     data: {
       userId,
-      name: "Weekly Workout Plan",
+      name: "My Plan",
       isActive: true,
       days: { create: buildDefaultPlanDays() },
     },
