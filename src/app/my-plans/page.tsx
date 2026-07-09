@@ -1,9 +1,11 @@
 import AppSidebar from '@/components/layout/AppSidebar';
 import MyPlansExplorer from '@/components/plan/MyPlansExplorer';
+import AmbientGlow from '@/components/ui/AmbientGlow';
 
 export default function MyPlansPage() {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <AmbientGlow />
       <AppSidebar />
 
       <section className="relative z-10 mx-auto flex w-full max-w-[1550px] flex-col px-3 py-6 sm:px-5 lg:px-6 lg:py-8">

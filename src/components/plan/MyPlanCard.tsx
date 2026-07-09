@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { FavoritePlan } from './PlanProvider';
-import { surfaceGlowSoft } from '@/lib/surfaceStyles';
+import { ctaButtonGlow, interactiveCardHover, surfaceGlowSoft } from '@/lib/surfaceStyles';
 
 type MyPlanCardProps = {
   plan: FavoritePlan;
@@ -33,7 +33,9 @@ export default function MyPlanCard({ plan, onPreview, onApply, onDelete, onRenam
   }
 
   return (
-    <div className={`flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised ${surfaceGlowSoft}`}>
+    <div
+      className={`flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised ${surfaceGlowSoft} ${interactiveCardHover}`}
+    >
       <div className="h-1 w-full bg-brand" />
 
       <div className="flex flex-1 flex-col p-5">
@@ -94,7 +96,7 @@ export default function MyPlanCard({ plan, onPreview, onApply, onDelete, onRenam
           <button
             type="button"
             onClick={onApply}
-            className="flex-1 rounded-xl bg-brand py-2 text-sm font-semibold text-white shadow-md shadow-brand/25 transition hover:bg-brand/90"
+            className={`flex-1 rounded-xl py-2 text-sm font-semibold text-white ${ctaButtonGlow}`}
           >
             Apply Plan
           </button>

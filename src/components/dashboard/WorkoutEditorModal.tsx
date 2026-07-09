@@ -14,6 +14,7 @@ import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSo
 import type { DayPlan, PlanExercise } from "@/data/mockPlan";
 import { exercises, exerciseCategories, type Exercise, type ExerciseCategory } from "@/data/exercises";
 import { getMuscleGroupColor } from "@/lib/muscleGroupColor";
+import { ctaButtonGlow } from "@/lib/surfaceStyles";
 import SortableRow from "./SortableRow";
 
 // Modal içinde düzenlenen egzersiz: sets/reps ayrı alanlar (kullanıcı arayüzü gereği),
@@ -218,7 +219,7 @@ export default function WorkoutEditorModal({ day, onClose, onSave, onDelete }: W
               type="button"
               onClick={handleSave}
               disabled={!canSave}
-              className="rounded-xl bg-brand px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-brand/25 transition disabled:cursor-not-allowed disabled:opacity-40"
+              className={`rounded-xl px-4 py-1.5 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 ${ctaButtonGlow}`}
             >
               Save Workout
             </button>

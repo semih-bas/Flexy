@@ -13,7 +13,7 @@ import {
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { DayPlan, PlanExercise } from "@/data/mockPlan";
 import { getMuscleGroupColor } from "@/lib/muscleGroupColor";
-import { surfaceGlow, surfaceGlowSoft } from "@/lib/surfaceStyles";
+import { ctaButtonGlow, surfaceGlow, surfaceGlowSoft } from "@/lib/surfaceStyles";
 import { usePlan } from "@/components/plan/PlanProvider";
 import { useSettings, type WeekStartDay } from "@/components/settings/SettingsProvider";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -32,10 +32,10 @@ function getTodayDayName(): string {
 }
 
 const statusBadgeStyles: Record<DayStatus, string> = {
-  today: "bg-brand text-white shadow-sm shadow-brand/40",
-  completed: "border border-success/25 bg-success/15 text-success",
-  partial: "border border-warning/25 bg-warning/15 text-warning",
-  missed: "border border-danger/25 bg-danger/15 text-danger",
+  today: "bg-brand text-white shadow-sm shadow-brand/50",
+  completed: "border border-success/30 bg-success/20 text-success",
+  partial: "border border-warning/30 bg-warning/20 text-warning",
+  missed: "border border-danger/30 bg-danger/20 text-danger",
 };
 
 const statusBadgeLabel: Record<DayStatus, string> = {
@@ -71,7 +71,7 @@ function getStatus(day: DayPlan, temporal: Temporal): DayStatus | null {
 // turuncu-outline (workout olsa da olmasa da aynı, asla pasif görünmez).
 function getActionButtonClasses(temporal: Temporal) {
   if (temporal === "today") {
-    return "bg-brand text-white shadow-md shadow-brand/25";
+    return ctaButtonGlow;
   }
   if (temporal === "past") {
     return "border border-brand/30 text-brand/60 hover:border-brand hover:text-brand";

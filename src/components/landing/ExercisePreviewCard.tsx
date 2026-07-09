@@ -1,20 +1,17 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import type { Exercise } from '@/data/exercises';
-import { interactiveCardHover, surfaceGlowSoft } from '@/lib/surfaceStyles';
+import { surfaceGlowSoft } from '@/lib/surfaceStyles';
 
-type ExerciseCardProps = {
+type ExercisePreviewCardProps = {
   exercise: Exercise;
 };
 
-// Kartın tamamı ve View "butonu" aynı Link'i paylaşır: iç içe interaktif eleman (link içinde
-// button) olmaması için View görsel olarak buton ama gerçekte span'dir.
-export default function ExerciseCard({ exercise }: ExerciseCardProps) {
+// Landing'in Exercises tanıtım bölümü için: ExerciseCard'ın sade bir "önizleme" hali. Bilerek
+// Link DEĞİL — landing'den uygulama içine (/exercises/[id]) hiçbir link gitmemesi gerekiyor,
+// bu kart sadece görsel bir tanıtım, tıklanabilir değil.
+export default function ExercisePreviewCard({ exercise }: ExercisePreviewCardProps) {
   return (
-    <Link
-      href={`/exercises/${exercise.id}`}
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised ${surfaceGlowSoft} ${interactiveCardHover}`}
-    >
+    <div className={`flex h-full flex-col overflow-hidden rounded-2xl bg-surface-raised ${surfaceGlowSoft}`}>
       <div className="relative aspect-[4/3] w-full shrink-0 bg-background">
         {exercise.image ? (
           <Image
@@ -33,11 +30,7 @@ export default function ExerciseCard({ exercise }: ExerciseCardProps) {
               stroke="currentColor"
               strokeWidth="1.5"
             >
-              <path
-                d="M5 9v6M3 10v4M19 9v6M21 10v4M7 12h10"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <path d="M5 9v6M3 10v4M19 9v6M21 10v4M7 12h10" strokeLinecap="round" strokeLinejoin="round" />
               <rect x="5" y="7" width="2.4" height="10" rx="1" />
               <rect x="16.6" y="7" width="2.4" height="10" rx="1" />
             </svg>
@@ -58,11 +51,7 @@ export default function ExerciseCard({ exercise }: ExerciseCardProps) {
             {exercise.defaultSets}x{exercise.defaultReps}
           </span>
         </div>
-
-        <span className="block w-full rounded-xl border border-border py-2 text-center text-sm font-semibold text-foreground-muted transition group-hover:border-brand/60 group-hover:text-brand">
-          View
-        </span>
       </div>
-    </Link>
+    </div>
   );
 }

@@ -2,16 +2,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import StoreButton from '@/components/landing/StoreButton';
 
+// Landing sayfa içi anchor'lar dışında hiçbir yere gitmez: footer'dan uygulama içine
+// (dashboard/templates/exercises route'ları) link verilmiyor — tek teorik giriş Navbar'daki
+// Login/Create Account.
 const productLinks = [
   { label: 'Why Flexy', href: '#why-flexy' },
   { label: 'Preview', href: '#preview' },
   { label: 'Exercises', href: '#exercises' },
-];
-
-const appLinks = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Templates', href: '/templates' },
-  { label: 'Library', href: '/exercises' },
 ];
 
 function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
@@ -35,8 +32,8 @@ export default function Footer() {
   return (
     <footer className="border-t border-foreground-muted/10 bg-background">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-          <div className="col-span-2 sm:col-span-1">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+          <div>
             <Image
               src="/brand/logo-transparent.png"
               alt="Flexy"
@@ -50,7 +47,6 @@ export default function Footer() {
           </div>
 
           <FooterColumn title="Product" links={productLinks} />
-          <FooterColumn title="App" links={appLinks} />
 
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground-muted">Get the App</p>

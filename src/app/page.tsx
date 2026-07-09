@@ -1,9 +1,9 @@
-import Link from "next/link";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import FeatureCard from "@/components/landing/FeatureCard";
 import HeroSection from "@/components/landing/HeroSection";
-import ExerciseCard from "@/components/exercises/ExerciseCard";
+import ExercisePreviewCard from "@/components/landing/ExercisePreviewCard";
+import AmbientGlow from "@/components/ui/AmbientGlow";
 import { exercises } from "@/data/exercises";
 import { surfaceGlow } from "@/lib/surfaceStyles";
 
@@ -58,7 +58,8 @@ const previewExercises = exercises.filter((exercise) => previewExerciseIds.inclu
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="relative min-h-screen bg-background text-foreground">
+      <AmbientGlow />
       <Navbar />
       <HeroSection />
 
@@ -154,25 +155,16 @@ export default function Home() {
       </section>
 
       <section id="exercises" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium uppercase tracking-[0.3em] text-brand">Exercises</p>
-            <h2 className="mt-3 text-3xl font-semibold text-foreground sm:text-4xl">
-              A growing exercise library.
-            </h2>
-          </div>
-
-          <Link
-            href="/exercises"
-            className="inline-flex w-fit shrink-0 items-center rounded-2xl border border-foreground-muted/20 px-5 py-2.5 text-sm font-semibold text-foreground transition hover:border-brand/40"
-          >
-            Browse Library
-          </Link>
+        <div className="mb-8 max-w-2xl">
+          <p className="text-sm font-medium uppercase tracking-[0.3em] text-brand">Exercises</p>
+          <h2 className="mt-3 text-3xl font-semibold text-foreground sm:text-4xl">
+            A growing exercise library.
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {previewExercises.map((exercise) => (
-            <ExerciseCard key={exercise.id} exercise={exercise} />
+            <ExercisePreviewCard key={exercise.id} exercise={exercise} />
           ))}
         </div>
       </section>

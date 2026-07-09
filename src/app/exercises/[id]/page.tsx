@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import AppSidebar from '@/components/layout/AppSidebar';
+import AmbientGlow from '@/components/ui/AmbientGlow';
 import { exercises } from '@/data/exercises';
 import { surfaceGlow, surfaceGlowSoft } from '@/lib/surfaceStyles';
 
@@ -36,6 +37,7 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <AmbientGlow />
       <AppSidebar />
 
       <section className="relative z-10 mx-auto flex w-full max-w-5xl flex-col px-3 py-6 sm:px-5 lg:px-6 lg:py-8">
@@ -100,7 +102,7 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
               <h1 className="text-2xl font-bold leading-tight sm:text-3xl">{exercise.name}</h1>
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-brand/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-brand">
+                <span className="rounded-full bg-brand/20 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-brand">
                   {exercise.type}
                 </span>
                 <span className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground-muted">
@@ -188,7 +190,7 @@ export default async function ExerciseDetailPage({ params }: ExerciseDetailPageP
               <div key={`primary-${muscle}`} className={`rounded-2xl bg-surface p-4 ${surfaceGlowSoft}`}>
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-sm font-bold text-foreground">{muscle}</h3>
-                  <span className="shrink-0 rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-brand">
+                  <span className="shrink-0 rounded-full bg-brand/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-brand">
                     Primary Driver
                   </span>
                 </div>

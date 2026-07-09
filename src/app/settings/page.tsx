@@ -1,9 +1,11 @@
 import AppSidebar from '@/components/layout/AppSidebar';
 import SettingsPanels from '@/components/settings/SettingsPanels';
+import AmbientGlow from '@/components/ui/AmbientGlow';
 
 export default function SettingsPage() {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <AmbientGlow />
       <AppSidebar />
 
       <section className="relative z-10 mx-auto flex w-full max-w-3xl flex-col px-3 py-6 sm:px-5 lg:px-6 lg:py-8">

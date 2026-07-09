@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSettings, type Language } from '@/components/settings/SettingsProvider';
+import { ctaButtonGlow } from '@/lib/surfaceStyles';
 
 const navLinks = [
   { label: 'Home', href: '#home' },
@@ -73,7 +74,7 @@ export default function Navbar() {
           <a
             href="#"
             title="Coming soon"
-            className="rounded-full bg-brand px-3 py-2 text-sm font-semibold text-white shadow-sm shadow-brand/30 transition hover:bg-brand/90 sm:px-4"
+            className={`rounded-full px-3 py-2 text-sm font-semibold text-white sm:px-4 ${ctaButtonGlow}`}
           >
             Create Account
           </a>

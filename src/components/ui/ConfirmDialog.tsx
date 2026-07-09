@@ -1,3 +1,5 @@
+import { ctaButtonGlow } from '@/lib/surfaceStyles';
+
 type ConfirmDialogProps = {
   title: string;
   description: string;
@@ -43,10 +45,10 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onConfirm}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-md transition ${
+            className={`rounded-xl px-4 py-2 text-sm font-semibold text-white ${
               danger
-                ? 'bg-danger shadow-danger/25 hover:bg-danger/90'
-                : 'bg-brand shadow-brand/25 hover:bg-brand/90'
+                ? 'bg-danger shadow-md shadow-danger/30 transition hover:bg-danger/90'
+                : ctaButtonGlow
             }`}
           >
             {confirmLabel}

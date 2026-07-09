@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ctaButtonGlow } from '@/lib/surfaceStyles';
 
 const heroStats = [
   { value: '7-Day', label: 'Planning' },
@@ -88,14 +89,16 @@ export default function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            {/* TODO: Faz 3'te auth eklenince burası bir auth gate'ten geçecek (girişsiz kullanıcı
-                önce login/signup'a yönlendirilebilir). Geliştirme sürecinde doğrudan /dashboard'a gider. */}
-            <Link
-              href="/dashboard"
-              className="rounded-2xl bg-brand px-6 py-3 text-center text-sm font-bold text-white shadow-lg shadow-brand/30 transition hover:bg-brand/90"
+            {/* TODO: Faz 3'te auth eklenince buraya gerçek bir auth gate bağlanacak ve girişten
+                sonra /dashboard'a yönlendirecek. Landing'den uygulamaya sızıntı olmasın diye
+                şimdilik tıklanabilir ama işlevsiz (Login/Create Account ile aynı "coming soon" deseni). */}
+            <a
+              href="#"
+              title="Coming soon"
+              className={`rounded-2xl px-6 py-3 text-center text-sm font-bold text-white ${ctaButtonGlow}`}
             >
               Start Planning
-            </Link>
+            </a>
             <Link
               href="#preview"
               className="rounded-2xl border border-foreground-muted/20 px-6 py-3 text-center text-sm font-bold text-foreground transition hover:border-brand/40"
@@ -119,41 +122,42 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Telefon, hero'nun sağ yarısını kaplar. Özellikler ayrıca anlatılmıyor burada —
-            "Why Flexy" bölümü bu işi zaten yapıyor, hero sade kalsın diye sadece başlık + telefon. */}
-        <div className="relative mx-auto w-full max-w-[320px] py-4 lg:max-w-none lg:py-10">
-          <div className="relative z-10 mx-auto w-[260px] sm:w-[300px] lg:w-[320px]">
-            <div aria-hidden className="absolute -inset-8 rounded-[3.5rem] bg-brand/15 blur-3xl" />
+        {/* Telefon, hero'nun sağ yarısının odağı: dikeyde belirgin büyük (hero yüksekliğinin
+            ~%80-85'i hissi), oran korunarak. Özellikler ayrıca anlatılmıyor burada — "Why Flexy"
+            bölümü bu işi zaten yapıyor, hero sade kalsın diye sadece başlık + telefon. */}
+        <div className="relative mx-auto w-full max-w-[360px] py-6 lg:max-w-none lg:py-4">
+          <div className="relative z-10 mx-auto w-[300px] sm:w-[360px] lg:w-[420px]">
+            <div aria-hidden className="absolute -inset-10 rounded-[3.5rem] bg-brand/15 blur-3xl" />
 
             {/* CSS ile çizilen telefon çerçevesi: gerçek fotoğraf mockup yok, kalın kasa + notch +
                 yan tuşlar + home indicator ile telefon hissi veriliyor, içi mini dashboard önizlemesi. */}
-            <div className="relative rounded-[3rem] border-[8px] border-foreground/10 bg-[#0b0f16] shadow-2xl shadow-black/50">
-              <span aria-hidden className="absolute -left-[9px] top-20 h-8 w-[3px] rounded-full bg-foreground/10" />
-              <span aria-hidden className="absolute -left-[9px] top-32 h-12 w-[3px] rounded-full bg-foreground/10" />
-              <span aria-hidden className="absolute -right-[9px] top-28 h-14 w-[3px] rounded-full bg-foreground/10" />
+            <div className="relative rounded-[3.25rem] border-[10px] border-foreground/10 bg-[#0b0f16] shadow-2xl shadow-black/50">
+              <span aria-hidden className="absolute -left-[11px] top-24 h-9 w-[3px] rounded-full bg-foreground/10" />
+              <span aria-hidden className="absolute -left-[11px] top-36 h-14 w-[3px] rounded-full bg-foreground/10" />
+              <span aria-hidden className="absolute -right-[11px] top-32 h-16 w-[3px] rounded-full bg-foreground/10" />
 
               <div
                 aria-hidden
-                className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-foreground/10"
+                className="absolute left-1/2 top-4 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-foreground/10"
               />
 
-              <div className="overflow-hidden rounded-[2.4rem] bg-surface-raised p-4 pt-9">
+              <div className="overflow-hidden rounded-[2.6rem] bg-surface-raised p-5 pt-11">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-semibold text-foreground-muted">Hello, Flexy!</p>
-                    <h3 className="text-lg font-bold text-foreground">Your Week</h3>
+                    <p className="text-xs font-semibold text-foreground-muted">Hello, Flexy!</p>
+                    <h3 className="text-xl font-bold text-foreground">Your Week</h3>
                   </div>
-                  <span className="rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold text-white shadow-sm shadow-brand/40">
+                  <span className="rounded-full bg-brand px-3 py-1 text-[11px] font-bold text-white shadow-sm shadow-brand/40">
                     Active
                   </span>
                 </div>
 
-                <div className="mt-3 grid grid-cols-7 gap-1">
+                <div className="mt-4 grid grid-cols-7 gap-1.5">
                   {miniWeek.map((entry) => (
-                    <div key={entry.day} className="flex flex-col items-center gap-1">
-                      <span className="text-[9px] font-semibold text-foreground-muted">{entry.day}</span>
+                    <div key={entry.day} className="flex flex-col items-center gap-1.5">
+                      <span className="text-[10px] font-semibold text-foreground-muted">{entry.day}</span>
                       <span
-                        className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${miniDayStyles[entry.status]}`}
+                        className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${miniDayStyles[entry.status]}`}
                       >
                         {entry.status === 'completed' ? '✓' : ''}
                       </span>
@@ -161,27 +165,27 @@ export default function HeroSection() {
                   ))}
                 </div>
 
-                <div className="mt-3 flex items-center justify-between rounded-xl border border-brand/20 bg-brand/10 px-3 py-2">
-                  <span className="text-[11px] font-semibold text-foreground-muted">Weekly Streak</span>
-                  <span className="text-xs font-bold text-brand">5 day streak</span>
+                <div className="mt-4 flex items-center justify-between rounded-xl border border-brand/20 bg-brand/10 px-3.5 py-2.5">
+                  <span className="text-xs font-semibold text-foreground-muted">Weekly Streak</span>
+                  <span className="text-sm font-bold text-brand">5 day streak</span>
                 </div>
 
-                <div className="mt-3 border-t border-border pt-3">
-                  <div className="flex items-center justify-between text-[11px] font-semibold">
+                <div className="mt-4 border-t border-border pt-4">
+                  <div className="flex items-center justify-between text-xs font-semibold">
                     <span className="uppercase tracking-[0.15em] text-foreground-muted">Weekly Progress</span>
                     <span className="text-foreground">68%</span>
                   </div>
-                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-background">
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-background">
                     <div className="h-full w-[68%] rounded-full bg-brand" />
                   </div>
                 </div>
 
-                <div className="mt-3 rounded-2xl bg-background p-3.5">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand">Today</p>
-                  <h4 className="mt-1 text-sm font-bold text-foreground">Chest &amp; Triceps</h4>
-                  <div className="mt-2 space-y-1.5">
+                <div className="mt-4 rounded-2xl bg-background p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand">Today</p>
+                  <h4 className="mt-1.5 text-base font-bold text-foreground">Chest &amp; Triceps</h4>
+                  <div className="mt-2.5 space-y-2">
                     {todaySessionExercises.map((exercise) => (
-                      <div key={exercise.name} className="flex items-center justify-between text-[11px]">
+                      <div key={exercise.name} className="flex items-center justify-between text-xs">
                         <span className="text-foreground-muted">{exercise.name}</span>
                         <span className="font-semibold text-foreground">{exercise.sets}</span>
                       </div>
@@ -189,17 +193,17 @@ export default function HeroSection() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-around border-t border-border pt-3">
+                <div className="mt-5 flex items-center justify-around border-t border-border pt-4">
                   {phoneBottomNav.map((item, index) => (
-                    <div key={item.label} className="flex flex-col items-center gap-1">
+                    <div key={item.label} className="flex flex-col items-center gap-1.5">
                       <span
-                        className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                        className={`flex h-10 w-10 items-center justify-center rounded-full ${
                           index === 0 ? 'bg-brand text-white shadow-sm shadow-brand/40' : 'bg-background text-foreground-muted'
                         }`}
                       >
                         {item.icon}
                       </span>
-                      <span className="text-[9px] font-semibold text-foreground-muted">{item.label}</span>
+                      <span className="text-[10px] font-semibold text-foreground-muted">{item.label}</span>
                     </div>
                   ))}
                 </div>
@@ -207,7 +211,7 @@ export default function HeroSection() {
 
               <div
                 aria-hidden
-                className="absolute bottom-2 left-1/2 h-1 w-20 -translate-x-1/2 rounded-full bg-foreground/15"
+                className="absolute bottom-2.5 left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-foreground/15"
               />
             </div>
           </div>

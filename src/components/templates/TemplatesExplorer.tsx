@@ -6,6 +6,7 @@ import type { TemplateCategory, WorkoutTemplate } from '@/data/workoutTemplates'
 import { usePlan } from '@/components/plan/PlanProvider';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { buildWeekFromTemplate } from '@/lib/applyTemplate';
+import { ctaButtonGlow } from '@/lib/surfaceStyles';
 import TemplateCard from './TemplateCard';
 import TemplatePreviewModal from './TemplatePreviewModal';
 
@@ -148,7 +149,7 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
               <button
                 type="button"
                 onClick={() => setUsePlanStep({ type: 'confirmApply', template: usePlanStep.template })}
-                className="w-full rounded-xl bg-brand px-4 py-3 text-left transition hover:bg-brand/90"
+                className={`w-full rounded-xl px-4 py-3 text-left ${ctaButtonGlow}`}
               >
                 <span className="block text-sm font-semibold text-white">Apply as active plan</span>
                 <span className="block text-xs text-white/80">Overwrites your current dashboard week.</span>
@@ -226,7 +227,7 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
               <button
                 type="button"
                 onClick={() => confirmSaveToMyPlans(usePlanStep.template)}
-                className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand/25 transition hover:bg-brand/90"
+                className={`rounded-xl px-4 py-2 text-sm font-semibold text-white ${ctaButtonGlow}`}
               >
                 Save
               </button>
@@ -257,7 +258,7 @@ export default function TemplatesExplorer({ templates, categories }: TemplatesEx
             <button
               type="button"
               onClick={() => setUsePlanStep(null)}
-              className="mt-5 w-full rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand/25 transition hover:bg-brand/90"
+              className={`mt-5 w-full rounded-xl px-4 py-2 text-sm font-semibold text-white ${ctaButtonGlow}`}
             >
               Done
             </button>
