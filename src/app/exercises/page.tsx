@@ -1,9 +1,16 @@
 import AppSidebar from '@/components/layout/AppSidebar';
 import ExerciseExplorer from '@/components/exercises/ExerciseExplorer';
 import AmbientGlow from '@/components/ui/AmbientGlow';
-import { exerciseCategories, exercises } from '@/data/exercises';
+import { exerciseCategories } from '@/data/exercises';
+import { prisma } from '@/lib/prisma';
+import { toExercise } from '@/lib/exerciseSerializer';
 
-export default function ExercisesPage() {
+export default async function ExercisesPage() {
+  // exerciseCategories sadece filtre haplarının sabit sırasını taşır (bkz. data dosyası); asıl
+  // egzersiz verisi artık DB'den geliyor.
+  const rows = await prisma.exercise.findMany({ orderBy: [{ category: 'asc' }, { name: 'asc' }] });
+  const exercises = rows.map(toExercise);
+
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <AmbientGlow />

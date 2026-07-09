@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import AppSidebar from '@/components/layout/AppSidebar';
 import AmbientGlow from '@/components/ui/AmbientGlow';
-import { exercises } from '@/data/exercises';
+import { prisma } from '@/lib/prisma';
+import { toExercise } from '@/lib/exerciseSerializer';
 import { surfaceGlow, surfaceGlowSoft } from '@/lib/surfaceStyles';
 
 type ExerciseDetailPageProps = {
@@ -12,9 +13,10 @@ type ExerciseDetailPageProps = {
 
 // Build sırasında 25 egzersizin tamamı için statik HTML üretilir (SSG): sayfa her istekte
 // yeniden render edilmek yerine önceden hazırlanır, bu da açılışı anında ve sunucu yükünü sıfıra
-// yakın yapar. Veri her build'de sabit olduğu için (henüz backend yok) bu ideal bir kullanım.
-export function generateStaticParams() {
-  return exercises.map((exercise) => ({ id: exercise.id }));
+// yakın yapar. id listesi artık DB'den geliyor (build anında sorgulanır).
+export async function generateStaticParams() {
+  const rows = await prisma.exercise.findMany({ select: { id: true } });
+  return rows.map((row) => ({ id: row.id }));
 }
 
 // DETAILED MUSCLE INVOLVEMENT kartlarındaki cümleler şimdilik kas adına göre şablondan üretiliyor.
@@ -29,11 +31,13 @@ function muscleInvolvementBlurb(muscle: string, role: 'primary' | 'secondary'): 
 
 export default async function ExerciseDetailPage({ params }: ExerciseDetailPageProps) {
   const { id } = await params;
-  const exercise = exercises.find((entry) => entry.id === id);
+  const row = await prisma.exercise.findUnique({ where: { id } });
 
-  if (!exercise) {
+  if (!row) {
     notFound();
   }
+
+  const exercise = toExercise(row);
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">

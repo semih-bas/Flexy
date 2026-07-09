@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  plans     Plan[]
+}
+
+// isActive=true olan tek kayıt, kullanıcının dashboard'daki aktif haftalık planıdır (her
+// kullanıcı için tam olarak bir tane, kayıt olunca oluşturulur). isActive=false olanlar My
+// Plans'taki favoriler. linkedFavoriteId, aktif plan bir favoriden geldiyse/favoriye
+// kaydedildiyse o favorinin id'sini tutar (frontend'deki activeFavoriteId ile birebir eşleşir) —
+// gerçek bir FK ilişkisi değil, favori silinince uygulama kodu bunu null'lar.
+model Plan {
+  id               String    @id @default(cuid())
+  name             String
+  isActive         Boolean   @default(false)
+  linkedFavoriteId String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String
+  days             PlanDay[]
+
+  @@index([userId])
+}
+
+model PlanDay {
+  id          String         @id @default(cuid())
+  day         String
+  workoutName String?
+  sortOrder   Int
+  plan        Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId      String
+  exercises   PlanExercise[]
+
+  @@index([planId])
+}
+
+model PlanExercise {
+  id          String  @id @default(cuid())
+  name        String
+  sets        String
+  muscleGroup String?
+  completed   Boolean @default(false)
+  sortOrder   Int
+  planDay     PlanDay @relation(fields: [planDayId], references: [id], onDelete: Cascade)
+  planDayId   String
+
+  @@index([planDayId])
+}
+
+model Exercise {
+  id                 String   @id
+  name               String
+  category           String
+  primaryMuscles     String[]
+  secondaryMuscles   String[]
+  equipment          String
+  level              String
+  trainingType       String
+  type               String
+  pattern            String
+  purpose            String
+  strengthBenefit    String
+  hypertrophyBenefit String
+  quickFact          String
+  image              String?
+  description        String
+  tips               String[]
+  commonMistakes     String[]
+  defaultSets        Int
+  defaultReps        String
+}
+
+// Şablonlar salt-okunur referans veridir (Templates sayfası), kullanıcıya özel değildir.
+// sortOrder, Templates sayfasındaki kart sırasının seed.ts'teki (ve eski workoutTemplates.ts'teki)
+// sırayla aynı kalması için var — Postgres'te ORDER BY olmadan satır sırası garanti değildir.
+model Template {
+  id          String        @id
+  name        String
+  level       String
+  categories  String[]
+  highlight   String
+  description String
+  daysPerWeek Int
+  features    String[]
+  sortOrder   Int           @default(0)
+  days        TemplateDay[]
+}
+
+model TemplateDay {
+  id          String             @id @default(cuid())
+  day         String
+  workoutName String
+  sortOrder   Int
+  template    Template           @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateId  String
+  exercises   TemplateExercise[]
+
+  @@index([templateId])
+}
+
+model TemplateExercise {
+  id            String      @id @default(cuid())
+  name          String
+  sets          String
+  muscleGroup   String?
+  sortOrder     Int
+  templateDay   TemplateDay @relation(fields: [templateDayId], references: [id], onDelete: Cascade)
+  templateDayId String
+
+  @@index([templateDayId])
+}

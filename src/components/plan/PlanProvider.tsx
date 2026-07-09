@@ -1,18 +1,32 @@
 'use client';
 
-import { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { mockWeekPlan, type DayPlan } from '@/data/mockPlan';
 import type { WorkoutTemplate } from '@/data/workoutTemplates';
 import { buildWeekFromTemplate, WEEKDAYS } from '@/lib/applyTemplate';
 
-// TODO: Faz 3'te backend/veritabanı gelince favoritePlans kalıcı hale gelecek (şimdilik
-// sadece hafızada tutulur, sayfa yenilenince kaybolur).
 export type FavoritePlan = {
   id: string;
   name: string;
   savedAt: string;
   week: DayPlan[];
 };
+
+const JSON_HEADERS = { 'Content-Type': 'application/json' };
+
+// Sunucudan gelen plan gövdesini (bkz. src/lib/planSerializer.ts) frontend'in beklediği şekle
+// (id/name/savedAt/week) çevirir — hem aktif plan hem favoriler aynı şekli paylaşıyor.
+type ApiPlan = {
+  id: string;
+  name: string;
+  linkedFavoriteId: string | null;
+  savedAt: string;
+  days: DayPlan[];
+};
+
+function toFavoritePlan(apiPlan: ApiPlan): FavoritePlan {
+  return { id: apiPlan.id, name: apiPlan.name, savedAt: apiPlan.savedAt, week: apiPlan.days };
+}
 
 function copyWeek(week: DayPlan[]): DayPlan[] {
   return week.map((day) => ({ ...day, exercises: day.exercises.map((exercise) => ({ ...exercise })) }));
@@ -40,15 +54,77 @@ type PlanContextValue = {
 const PlanContext = createContext<PlanContextValue | null>(null);
 
 // Context: dashboard ve templates/my-plans sayfaları aynı haftalık plan state'ini paylaşsın diye
-// kullanılır. Context olmadan bu state sadece bulunduğu bileşende yaşardı; templates veya
-// my-plans sayfasında bir planı uyguladığımızda dashboard'un state'ine erişimimiz olmazdı.
-// Provider, state'i ağacın üstünde tutar, alttaki her sayfa/bileşen usePlan() ile aynı veriyi
-// okuyup güncelleyebilir.
+// kullanılır. Provider ayrıca bu state'i /api/plan ve /api/plans üzerinden veritabanına bağlar:
+// açılışta fetch eder, sonraki her değişiklikte (tik, sürükleme, save workout, rename) debounce'lı
+// olarak geri yazar. Giriş yapılmamışsa (ör. landing sayfası) fetch'ler sessizce 401 döner ve
+// mockWeekPlan yerel varsayılan olarak kalır — hiçbir şey kırılmaz.
 export function PlanProvider({ children }: { children: ReactNode }) {
   const [plan, setPlan] = useState<DayPlan[]>(mockWeekPlan);
   const [activePlanName, setActivePlanName] = useState('Weekly Workout Plan');
   const [activeFavoriteId, setActiveFavoriteId] = useState<string | null>(null);
   const [favoritePlans, setFavoritePlans] = useState<FavoritePlan[]>([]);
+
+  // hasLoaded: ilk GET tamamlanana kadar debounce'lı PUT efekti hiç çalışmasın (mock veriyi
+  // sunucuya yazıp gerçek veriyi ezmeyelim). skipNextPersist: ilk GET'in kendi state
+  // güncellemesi PUT efektini tetiklediğinde, aynı veriyi hemen geri yazmayı atlar.
+  const hasLoadedRef = useRef(false);
+  const skipNextPersistRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadInitialState() {
+      try {
+        const [planResponse, favoritesResponse] = await Promise.all([
+          fetch('/api/plan'),
+          fetch('/api/plans'),
+        ]);
+
+        if (!cancelled && planResponse.ok) {
+          const { plan: apiPlan } = (await planResponse.json()) as { plan: ApiPlan };
+          skipNextPersistRef.current = true;
+          setPlan(apiPlan.days);
+          setActivePlanName(apiPlan.name);
+          setActiveFavoriteId(apiPlan.linkedFavoriteId);
+        }
+
+        if (!cancelled && favoritesResponse.ok) {
+          const { plans } = (await favoritesResponse.json()) as { plans: ApiPlan[] };
+          setFavoritePlans(plans.map(toFavoritePlan));
+        }
+      } catch {
+        // Anonim ziyaretçi (landing) ya da ağ hatası: yerel mock state ile sessizce devam edilir.
+      } finally {
+        if (!cancelled) hasLoadedRef.current = true;
+      }
+    }
+
+    loadInitialState();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Aktif planın tam durumu (ad + günler + favori bağı) tek parça olarak, kısa bir debounce ile
+  // sunucuya yazılır — her tik/sürükleme için ayrı ayrı istek atmak yerine art arda gelen
+  // değişiklikleri birleştirir.
+  useEffect(() => {
+    if (!hasLoadedRef.current) return;
+    if (skipNextPersistRef.current) {
+      skipNextPersistRef.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      fetch('/api/plan', {
+        method: 'PUT',
+        headers: JSON_HEADERS,
+        body: JSON.stringify({ name: activePlanName, days: plan, linkedFavoriteId: activeFavoriteId }),
+      }).catch(() => {});
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [plan, activePlanName, activeFavoriteId]);
 
   // Bir şablon uygulamak aktif planı favori bağından koparır: artık hiçbir kayıtlı favorinin
   // birebir kopyası değil, bağımsız bir plan.
@@ -69,31 +145,41 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     const trimmed = name.trim() || 'My Plan';
     setActivePlanName(trimmed);
     if (activeFavoriteId) {
+      const linkedId = activeFavoriteId;
       setFavoritePlans((prev) =>
-        prev.map((favorite) => (favorite.id === activeFavoriteId ? { ...favorite, name: trimmed } : favorite)),
+        prev.map((favorite) => (favorite.id === linkedId ? { ...favorite, name: trimmed } : favorite)),
       );
+      fetch(`/api/plans/${linkedId}`, {
+        method: 'PUT',
+        headers: JSON_HEADERS,
+        body: JSON.stringify({ name: trimmed }),
+      }).catch(() => {});
     }
   }
 
-  // Dashboard'daki "Save as favorite" butonu: aktif plan zaten bir favoriye bağlıysa doğrudan o
-  // favoriyi günceller (id üzerinden); bağlı değilse aynı adla favori olup olmadığına bakmak
-  // arayüzün işi (bkz. WeeklyPlanBoard) — burada verilen ad neyse ona göre yeni favori oluşturur
-  // veya üzerine yazar ve bağı kurar.
+  // Dashboard'daki "Save as favorite" butonu: sunucu tarafı aktif plan zaten bir favoriye
+  // bağlıysa doğrudan o favoriyi günceller, değilse aynı adla favori olup olmadığına bakar
+  // (bkz. /api/plans POST) — burada sadece isteği atıp yanıtla yerel state'i senkronluyoruz.
   function saveActivePlanAsFavorite(name: string) {
     const trimmedName = name.trim() || 'My Plan';
-    const targetIndex = activeFavoriteId
-      ? favoritePlans.findIndex((favorite) => favorite.id === activeFavoriteId)
-      : favoritePlans.findIndex((favorite) => favorite.name.trim().toLowerCase() === trimmedName.toLowerCase());
-    const id = targetIndex === -1 ? crypto.randomUUID() : favoritePlans[targetIndex].id;
-    const entry: FavoritePlan = { id, name: trimmedName, savedAt: new Date().toISOString(), week: copyWeek(plan) };
-
-    setFavoritePlans((prev) => {
-      const index = prev.findIndex((favorite) => favorite.id === id);
-      if (index === -1) return [entry, ...prev];
-      return prev.map((favorite, i) => (i === index ? entry : favorite));
-    });
-    setActivePlanName(trimmedName);
-    setActiveFavoriteId(id);
+    fetch('/api/plans', {
+      method: 'POST',
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ name: trimmedName }),
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { plan: ApiPlan } | null) => {
+        if (!data) return;
+        const favorite = toFavoritePlan(data.plan);
+        setFavoritePlans((prev) => {
+          const index = prev.findIndex((entry) => entry.id === favorite.id);
+          if (index === -1) return [favorite, ...prev];
+          return prev.map((entry, i) => (i === index ? favorite : entry));
+        });
+        setActivePlanName(trimmedName);
+        setActiveFavoriteId(favorite.id);
+      })
+      .catch(() => {});
   }
 
   // Aynı adla kayıtlı favori varsa üzerine yazar (aynı id korunur); yoksa listenin başına yeni
@@ -101,21 +187,22 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   // kaydetme işlemidir — activeFavoriteId'yi değiştirmez.
   function saveFavoritePlan(name: string, week: DayPlan[]) {
     const trimmedName = name.trim() || 'My Plan';
-
-    setFavoritePlans((prev) => {
-      const existingIndex = prev.findIndex(
-        (favorite) => favorite.name.trim().toLowerCase() === trimmedName.toLowerCase(),
-      );
-      const entry: FavoritePlan = {
-        id: existingIndex === -1 ? crypto.randomUUID() : prev[existingIndex].id,
-        name: trimmedName,
-        savedAt: new Date().toISOString(),
-        week: copyWeek(week),
-      };
-
-      if (existingIndex === -1) return [entry, ...prev];
-      return prev.map((favorite, index) => (index === existingIndex ? entry : favorite));
-    });
+    fetch('/api/plans', {
+      method: 'POST',
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ name: trimmedName, days: copyWeek(week) }),
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { plan: ApiPlan } | null) => {
+        if (!data) return;
+        const favorite = toFavoritePlan(data.plan);
+        setFavoritePlans((prev) => {
+          const index = prev.findIndex((entry) => entry.id === favorite.id);
+          if (index === -1) return [favorite, ...prev];
+          return prev.map((entry, i) => (i === index ? favorite : entry));
+        });
+      })
+      .catch(() => {});
   }
 
   // My Plans / Templates > Apply: favoriyi aktif plana uygular ve bağı kurar.
@@ -123,6 +210,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     setPlan(copyWeek(favoritePlan.week));
     setActivePlanName(favoritePlan.name);
     setActiveFavoriteId(favoritePlan.id);
+    fetch(`/api/plans/${favoritePlan.id}`, { method: 'POST' }).catch(() => {});
   }
 
   // My Plans kartındaki kalem ikonu: favori adını değiştirir; bu favori şu an aktif plana
@@ -135,6 +223,11 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     if (activeFavoriteId === id) {
       setActivePlanName(trimmed);
     }
+    fetch(`/api/plans/${id}`, {
+      method: 'PUT',
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ name: trimmed }),
+    }).catch(() => {});
   }
 
   function deleteFavoritePlan(id: string) {
@@ -142,12 +235,17 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     if (activeFavoriteId === id) {
       setActiveFavoriteId(null);
     }
+    fetch(`/api/plans/${id}`, { method: 'DELETE' }).catch(() => {});
   }
 
   // Settings > Danger zone > Clear favorite plans.
   function clearFavoritePlans() {
+    const ids = favoritePlans.map((favorite) => favorite.id);
     setFavoritePlans([]);
     setActiveFavoriteId(null);
+    ids.forEach((id) => {
+      fetch(`/api/plans/${id}`, { method: 'DELETE' }).catch(() => {});
+    });
   }
 
   return (

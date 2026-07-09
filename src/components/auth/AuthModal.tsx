@@ -91,6 +91,7 @@ function GoogleIcon() {
 
 type AuthFieldProps = {
   label: string;
+  name: string;
   type: string;
   placeholder: string;
   autoComplete: string;
@@ -99,7 +100,7 @@ type AuthFieldProps = {
 
 // Name/Email alanları aynı ikonlu-input desenini paylaşıyor: tek yerden üretiliyor. Password
 // alanı ayrı (göster/gizle butonu gerektiği için) ama aynı görsel dili kullanıyor.
-function AuthField({ label, type, placeholder, autoComplete, icon }: AuthFieldProps) {
+function AuthField({ label, name, type, placeholder, autoComplete, icon }: AuthFieldProps) {
   return (
     <label className="flex flex-col gap-1.5">
       <span className="text-xs font-semibold uppercase tracking-[0.15em] text-foreground-muted">{label}</span>
@@ -108,9 +109,11 @@ function AuthField({ label, type, placeholder, autoComplete, icon }: AuthFieldPr
           {icon}
         </span>
         <input
+          name={name}
           type={type}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          required
           className="w-full rounded-xl border border-border bg-background py-2.5 pl-10 pr-3.5 text-sm text-foreground outline-none transition placeholder:text-foreground-muted/50 focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
         />
       </div>
@@ -135,9 +138,12 @@ function PasswordField({
           <LockIcon />
         </span>
         <input
+          name="password"
           type={showPassword ? 'text' : 'password'}
           placeholder="••••••••"
           autoComplete={autoComplete}
+          required
+          minLength={8}
           className="w-full rounded-xl border border-border bg-background py-2.5 pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-foreground-muted/50 focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
         />
         <button
@@ -156,10 +162,9 @@ function PasswordField({
 // Login ve Register aynı bileşen: tek kaynak, mode prop'una göre alan/metin farkı gösteriyor.
 export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isLogin = mode === 'login';
-  // Backend bağlanınca burada gerçek bir hata mesajı set edilecek; şimdilik hep null, satır
-  // hiç render edilmiyor — stil hazır, davranış TODO.
-  const errorMessage: string | null = null;
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -169,10 +174,47 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  // TODO: Faz 3'te auth eklenince gerçek login/register isteğine bağlanacak. Şimdilik form
-  // sadece sayfanın yenilenmesini engelliyor, hiçbir şey göndermiyor.
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+    const payload = isLogin
+      ? {
+          email: formData.get('email'),
+          password: formData.get('password'),
+        }
+      : {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          password: formData.get('password'),
+        };
+
+    try {
+      const response = await fetch(isLogin ? '/api/auth/login' : '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setErrorMessage(data.error ?? 'Something went wrong. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      onClose();
+      // Bilerek router.push değil: PlanProvider/SettingsProvider layout'ta bir kez mount olup
+      // açılışta fetch ediyor; client-side navigasyon bu Provider'ları yeniden mount etmediği için
+      // yeni oturumun verisini hiç çekmezlerdi. Tam sayfa yenilemesi hepsini temiz bir oturumla
+      // sıfırdan başlatır.
+      window.location.href = '/dashboard';
+    } catch {
+      setErrorMessage('Something went wrong. Please try again.');
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -211,10 +253,18 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           {!isLogin && (
-            <AuthField label="Name" type="text" placeholder="Your name" autoComplete="name" icon={<UserIcon />} />
+            <AuthField
+              label="Name"
+              name="name"
+              type="text"
+              placeholder="Your name"
+              autoComplete="name"
+              icon={<UserIcon />}
+            />
           )}
           <AuthField
             label="Email"
+            name="email"
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
@@ -243,9 +293,10 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
 
           <button
             type="submit"
-            className={`w-full rounded-xl px-4 py-2.5 text-sm font-bold text-white ${ctaButtonGlow}`}
+            disabled={isSubmitting}
+            className={`w-full rounded-xl px-4 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-70 ${ctaButtonGlow}`}
           >
-            {isLogin ? 'Log in' : 'Create account'}
+            {isSubmitting ? 'Please wait…' : isLogin ? 'Log in' : 'Create account'}
           </button>
         </form>
 
@@ -270,7 +321,10 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
           {isLogin ? 'New to Flexy? ' : 'Already have an account? '}
           <button
             type="button"
-            onClick={() => onSwitchMode(isLogin ? 'register' : 'login')}
+            onClick={() => {
+              setErrorMessage(null);
+              onSwitchMode(isLogin ? 'register' : 'login');
+            }}
             className="font-semibold text-brand transition hover:underline"
           >
             {isLogin ? 'Create account' : 'Log in'}

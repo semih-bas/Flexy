@@ -63,9 +63,22 @@ const navItems: NavItem[] = [
 
 export default function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const pathname = usePathname();
 
   const closeSidebar = () => setIsOpen(false);
+
+  // Tam sayfa yönlendirmesi bilerek: PlanProvider/SettingsProvider gibi context'ler layout'ta bir
+  // kez mount olup state tutuyor, client-side navigasyon bunları sıfırlamaz — çıkışta hafızada
+  // önceki kullanıcının planı/adı kalmasın diye landing'e sert bir yönlendirme yapılır.
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } finally {
+      window.location.href = '/';
+    }
+  }
 
   return (
     <>
@@ -159,9 +172,11 @@ export default function AppSidebar() {
           </p>
           <button
             type="button"
-            className="mt-4 w-full rounded-2xl border border-foreground-muted/15 bg-foreground/5 px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-foreground/10"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="mt-4 w-full rounded-2xl border border-foreground-muted/15 bg-foreground/5 px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-foreground/10 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Logout
+            {isLoggingOut ? 'Logging out…' : 'Logout'}
           </button>
         </div>
       </aside>

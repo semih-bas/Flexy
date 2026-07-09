@@ -1,9 +1,19 @@
 import AppSidebar from '@/components/layout/AppSidebar';
 import TemplatesExplorer from '@/components/templates/TemplatesExplorer';
 import AmbientGlow from '@/components/ui/AmbientGlow';
-import { templateCategories, workoutTemplates } from '@/data/workoutTemplates';
+import { templateCategories } from '@/data/workoutTemplates';
+import { prisma } from '@/lib/prisma';
+import { toWorkoutTemplate } from '@/lib/templateSerializer';
 
-export default function TemplatesPage() {
+export default async function TemplatesPage() {
+  // templateCategories sadece filtre haplarının sabit sırasını taşır; asıl şablon verisi artık
+  // DB'den geliyor (sortOrder, seed.ts'teki orijinal sırayı korur).
+  const rows = await prisma.template.findMany({
+    include: { days: { include: { exercises: true } } },
+    orderBy: { sortOrder: 'asc' },
+  });
+  const workoutTemplates = rows.map(toWorkoutTemplate);
+
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <AmbientGlow />

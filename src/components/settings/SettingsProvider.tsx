@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 
 export type WeekStartDay = 'Monday' | 'Sunday';
 export type WeightUnit = 'kg' | 'lb';
@@ -19,21 +19,66 @@ type SettingsContextValue = {
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
-// TODO: Faz 3'te auth/backend gelince userName gerçek hesaptan gelecek, tercihler kullanıcı
-// profiline kalıcı olarak yazılacak. Şimdilik sadece hafızada tutulur (sayfa yenilenince mock
-// değerlere döner). weightUnit henüz sadece görsel (TODO). language de sadece görsel/state —
-// gerçek i18n ileride ayrı bir iş olarak eklenecek, şu an arayüz metinleri değişmiyor.
+// TODO: weightUnit henüz sadece görsel. language de sadece görsel/state — gerçek i18n ileride
+// ayrı bir iş olarak eklenecek, şu an arayüz metinleri değişmiyor.
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [userName, setUserName] = useState('Semih Baş');
+  const [userName, setUserNameState] = useState('');
   const [weekStartDay, setWeekStartDay] = useState<WeekStartDay>('Monday');
   const [weightUnit, setWeightUnit] = useState<WeightUnit>('kg');
   const [language, setLanguage] = useState<Language>('EN');
+
+  // hasLoaded: ilk GET tamamlanana kadar debounce'lı PATCH efekti çalışmasın. skipNextPersist:
+  // ilk GET'in kendi state güncellemesi bu efekti tetiklediğinde aynı adı hemen geri yazmayı
+  // atlar (bkz. PlanProvider'daki aynı desen).
+  const hasLoadedRef = useRef(false);
+  const skipNextPersistRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch('/api/auth/me')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { user: { name: string } } | null) => {
+        if (cancelled || !data) return;
+        skipNextPersistRef.current = true;
+        setUserNameState(data.user.name);
+      })
+      .catch(() => {
+        // Anonim ziyaretçi (landing) ya da ağ hatası: isim boş kalır, WelcomeHeader vb. bunu
+        // görmez çünkü bu sayfalar zaten girişli kullanıcıya özel.
+      })
+      .finally(() => {
+        if (!cancelled) hasLoadedRef.current = true;
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedRef.current) return;
+    if (skipNextPersistRef.current) {
+      skipNextPersistRef.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      fetch('/api/auth/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: userName }),
+      }).catch(() => {});
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [userName]);
 
   return (
     <SettingsContext.Provider
       value={{
         userName,
-        setUserName,
+        setUserName: setUserNameState,
         weekStartDay,
         setWeekStartDay,
         weightUnit,
