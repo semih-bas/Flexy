@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flexy
 
-## Getting Started
+**Flexy** is a weekly workout planner that lets you build, organize, and track your training week — day by day, exercise by exercise. Plan your split, reorder exercises with drag & drop, follow your progress with automatically computed status badges, and start faster with ready-made workout templates.
 
-First, run the development server:
+> 🔗 **Live demo:** _coming soon_
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This is a complete rewrite of the original vanilla JavaScript prototype, rebuilt from the ground up with a modern, type-safe, full-stack architecture.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Weekly plan builder** — organize workouts across the week with a clean, single-screen dashboard
+- **Drag & drop reordering** — rearrange exercises inside a workout with [dnd-kit](https://dndkit.com/)
+- **Smart status badges** — Completed / Partial / Missed / Today, always computed from data, never stored
+- **Exercise library** — 25+ exercises with photos, search, and muscle-group filtering
+- **Workout templates** — apply a ready-made split to your plan in one click
+- **Multiple plans** — create, rename, and switch between training plans
+- **Authentication** — secure register/login with JWT sessions in HTTP-only cookies
+- **Dark navy theme** — custom design system built on Tailwind CSS 4 design tokens
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Layer | Technology |
+| --- | --- |
+| Framework | [Next.js 16](https://nextjs.org/) (App Router) + [React 19](https://react.dev/) |
+| Language | [TypeScript 5](https://www.typescriptlang.org/) |
+| Styling | [Tailwind CSS 4
