@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSettings, type Language } from '@/components/settings/SettingsProvider';
+import { useAuthModal } from '@/components/auth/AuthModalProvider';
 import { ctaButtonGlow } from '@/lib/surfaceStyles';
 
 const navLinks = [
@@ -16,6 +17,7 @@ const languages: Language[] = ['EN', 'TR'];
 
 export default function Navbar() {
   const { language, setLanguage } = useSettings();
+  const { openLogin, openRegister } = useAuthModal();
 
   return (
     <header className="sticky top-0 z-50 border-b border-foreground-muted/10 bg-background/80 backdrop-blur-xl">
@@ -39,8 +41,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* TODO: Faz 3'te auth eklenince Login/Create Account gerçek giriş ve kayıt akışına bağlanacak.
-            Dil hapı şimdilik sadece state değiştiriyor: gerçek i18n ileride ayrı bir iş. */}
+        {/* Dil hapı şimdilik sadece state değiştiriyor: gerçek i18n ileride ayrı bir iş. */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <div
             role="group"
@@ -64,20 +65,20 @@ export default function Navbar() {
             ))}
           </div>
 
-          <a
-            href="#"
-            title="Coming soon"
+          <button
+            type="button"
+            onClick={openLogin}
             className="rounded-full border border-foreground-muted/20 px-3 py-2 text-sm font-semibold text-foreground-muted transition hover:border-brand/40 hover:text-foreground sm:px-4"
           >
             Login
-          </a>
-          <a
-            href="#"
-            title="Coming soon"
+          </button>
+          <button
+            type="button"
+            onClick={openRegister}
             className={`rounded-full px-3 py-2 text-sm font-semibold text-white sm:px-4 ${ctaButtonGlow}`}
           >
             Create Account
-          </a>
+          </button>
         </div>
       </nav>
     </header>

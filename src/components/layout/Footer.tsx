@@ -32,7 +32,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-foreground-muted/10 bg-background">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-3 sm:items-start lg:grid-cols-[1.3fr_1fr_1fr] lg:gap-x-16">
           <div>
             <Image
               src="/brand/logo-transparent.png"
@@ -50,14 +50,14 @@ export default function Footer() {
 
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground-muted">Get the App</p>
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-3 flex flex-col gap-2.5">
               <StoreButton storeName="App Store" label="Coming soon" />
               <StoreButton storeName="Google Play" label="Coming soon" />
             </div>
           </div>
         </div>
 
-        <div className="mt-10 border-t border-foreground-muted/10 pt-6">
+        <div className="mt-10 border-t border-foreground-muted/10 pt-6 text-center">
           <p className="text-xs text-foreground-muted">&copy; {new Date().getFullYear()} Flexy</p>
         </div>
       </div>
