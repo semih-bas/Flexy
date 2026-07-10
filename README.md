@@ -2,6 +2,8 @@
 
 A full-stack fitness planning application — weekly workout planner, searchable exercise library, and reusable workout templates, built with a custom dark-theme design system.
 
+**Live Demo:** [flexy-tau.vercel.app](https://flexy-tau.vercel.app/)
+
 **Stack:** Next.js 16 · React 19 · TypeScript · Prisma · PostgreSQL
 
 ---
@@ -48,20 +50,18 @@ A full-stack fitness planning application — weekly workout planner, searchable
 
 Requires Node.js 18+ and a PostgreSQL database ([Neon](https://neon.tech) has a free tier).
 
-```bash
-git clone https://github.com/semih-bas/Flexy.git
-cd Flexy
-npm install
+    git clone https://github.com/semih-bas/Flexy.git
+    cd Flexy
+    npm install
 
-cp .env.example .env   # fill in DATABASE_URL and JWT_SECRET
+    cp .env.example .env   # fill in DATABASE_URL and JWT_SECRET
 
-npx prisma generate
-npx prisma db push
+    npx prisma generate
+    npx prisma db push
 
-npm run dev
-```
+    npm run dev
 
-The app runs at `https://flexy-tau.vercel.app/`.
+The app runs at `http://localhost:3000`.
 
 | Variable | Description |
 |---|---|
@@ -72,7 +72,7 @@ The app runs at `https://flexy-tau.vercel.app/`.
 
 - [x] Core planner, exercise library and templates
 - [x] JWT authentication and user settings
-- [ ] Production deployment on Vercel
+- [x] Production deployment on Vercel
 - [ ] Workout history and progress tracking
 - [ ] Mobile release (iOS / Android)
 
@@ -80,4 +80,4 @@ The app runs at `https://flexy-tau.vercel.app/`.
 
 **Semih Baş** — built as a learning-first project: every feature implemented with the goal of understanding *why*, not just *how*.
 
-[GitHub](https://github.com/semih-bas) · [LinkedIn](https://www.linkedin.com/in/bassemih/)
+[Live Demo](https://flexy-tau.vercel.app/) · [GitHub](https://github.com/semih-bas) · [LinkedIn](https://www.linkedin.com/in/bassemih/)
