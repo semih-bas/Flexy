@@ -1,94 +1,83 @@
 # Flexy
 
-**Flexy** is a weekly workout planner that lets you build, organize, and track your training week — day by day, exercise by exercise. Plan your split, reorder exercises with drag & drop, follow your progress with automatically computed status badges, and start faster with ready-made workout templates.
+A full-stack fitness planning application — weekly workout planner, searchable exercise library, and reusable workout templates, built with a custom dark-theme design system.
 
-> 🔗 **Live demo:** [flexy-tau.vercel.app](https://flexy-tau.vercel.app)
+**Live Demo:** _coming soon_ · **Stack:** Next.js 16 · React 19 · TypeScript · Prisma · PostgreSQL
 
-This is a complete rewrite of the original vanilla JavaScript prototype, rebuilt from the ground up with a modern, type-safe, full-stack architecture.
+---
 
-## Features
+### Screenshots
 
-- **Weekly plan builder** — organize workouts across the week with a clean, single-screen dashboard
-- **Drag & drop reordering** — rearrange exercises inside a workout with [dnd-kit](https://dndkit.com/)
-- **Smart status badges** — Completed / Partial / Missed / Today, always computed from data, never stored
-- **Exercise library** — 25+ exercises with photos, search, and muscle-group filtering
-- **Workout templates** — apply a ready-made split to your plan in one click
-- **Multiple plans** — create, rename, and switch between training plans
-- **Authentication** — secure register/login with JWT sessions in HTTP-only cookies
-- **Dark navy theme** — custom design system built on Tailwind CSS 4 design tokens
+![Dashboard](./screenshots/dashboard.png)
 
-## Tech Stack
+| Workout Templates | Saved Plans |
+|---|---|
+| ![Workout Templates](./screenshots/templates.png) | ![Saved Plans](./screenshots/plans.png) |
+
+### Features
+
+- **Weekly Workout Planner** — organize your training week with drag-and-drop reordering, day-by-day status tracking (completed / missed / today) and a live "Today" side panel
+- **Workout Templates** — 16 ready-made programs filterable by goal and level, each with preview and one-click apply
+- **My Plans** — save weekly plans and re-apply them to your dashboard anytime, with instant name synchronization
+- **Exercise Library** — search and filter a full exercise catalog, with a detail page for every exercise
+- **Secure Authentication** — JWT sessions in httpOnly cookies, passwords hashed with bcrypt
+- **Personalization** — user settings such as week-start preference
+
+### Tech Stack
 
 | Layer | Technology |
-| --- | --- |
-| Framework | [Next.js 16](https://nextjs.org/) (App Router) + [React 19](https://react.dev/) |
-| Language | [TypeScript 5](https://www.typescriptlang.org/) |
-| Styling | [Tailwind CSS 4](https://tailwindcss.com/) (`@theme` design tokens) |
-| Database | [PostgreSQL](https://www.postgresql.org/) on [Neon](https://neon.tech/) |
-| ORM | [Prisma 7](https://www.prisma.io/) |
-| Auth | JWT ([jose](https://github.com/panva/jose)) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js), HTTP-only cookies |
-| Drag & Drop | [dnd-kit](https://dndkit.com/) |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| UI | React 19, Tailwind CSS 4 |
+| Language | TypeScript 5 (strict mode) |
+| Database | PostgreSQL (Neon) |
+| ORM | Prisma |
+| Auth | jose (JWT), bcryptjs, httpOnly cookies |
+| Drag & Drop | dnd-kit |
+| Hosting | Vercel |
 
-## Architecture
+### Architecture
 
+- **Server/client separation** — data fetched in React Server Components, interactivity in focused client components
+- **Middleware-protected routes** — private routes validate the JWT from an httpOnly cookie before rendering
+- **Relational data model** — users, plans, workouts and exercises modeled in Prisma with referential integrity
+- **Context-driven state** — a `PlanProvider` keeps templates and plans in sync across the UI
+- **Design tokens** — colors, spacing and typography defined once via Tailwind 4 `@theme`
+
+### Run It Locally
+
+Requires Node.js 18+ and a PostgreSQL database ([Neon](https://neon.tech) has a free tier).
+
+```bash
+git clone https://github.com/semih-bas/Flexy.git
+cd Flexy
+npm install
+
+cp .env.example .env   # fill in DATABASE_URL and JWT_SECRET
+
+npx prisma generate
+npx prisma db push
+
+npm run dev
 ```
-src/
-├── app/            # App Router pages + REST-style API routes
-│   ├── api/        #   /auth (register, login, logout, me), /plan, /plans
-│   ├── dashboard/  #   weekly plan view
-│   ├── exercises/  #   exercise library + detail pages
-│   └── templates/  #   workout template gallery
-├── components/     # Feature-scoped React components (dashboard, plan, auth, ui, ...)
-├── lib/            # Auth, sessions, Prisma client, serializers, domain helpers
-└── data/           # Seed data: exercise library & workout templates
-prisma/             # Schema (User, Plan, PlanDay, PlanExercise, Exercise, Template*) + seed
-```
 
-Key principles:
+The app runs at `http://localhost:3000`.
 
-- **Derived data is never stored.** Completion counts, status badges, and "today" highlighting are always computed from the source data at render time.
-- **Thin API routes, reusable domain logic.** Route handlers validate and delegate to `lib/` (serializers, session handling, template application).
-- **Sessions via signed JWTs** stored in HTTP-only cookies — no client-side token handling.
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret used to sign JWT session tokens |
 
-## Getting Started
+### Roadmap
 
-### Prerequisites
+- [x] Core planner, exercise library and templates
+- [x] JWT authentication and user settings
+- [ ] Production deployment on Vercel
+- [ ] Workout history and progress tracking
+- [ ] Mobile release (iOS / Android)
 
-- Node.js 20+
-- A PostgreSQL database (a free [Neon](https://neon.tech/) instance works great)
+### Author
 
-### Setup
+**Semih Baş** — built as a learning-first project: every feature implemented with the goal of understanding *why*, not just *how*.
 
-1. **Clone and install:**
-
-   ```bash
-   git clone https://github.com/semih-bas/flexy.git
-   cd flexy
-   npm install
-   ```
-
-2. **Configure environment.** Create a `.env` file in the project root:
-
-   ```env
-   DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
-   AUTH_SECRET="a-long-random-secret-for-signing-jwts"
-   ```
-
-3. **Push the schema and seed the database:**
-
-   ```bash
-   npx prisma db push
-   npm run db:seed
-   ```
-
-4. **Run the dev server:**
-
-   ```bash
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000).
-
-## License
-
-This project was built as a personal learning p
+[GitHub](https://github.com/semih-bas) · [LinkedIn](https://www.linkedin.com/in/bassemih/)
