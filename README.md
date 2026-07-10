@@ -2,7 +2,7 @@
 
 A full-stack fitness planning application — weekly workout planner, searchable exercise library, and reusable workout templates, built with a custom dark-theme design system.
 
-**Live Demo:** _coming soon_ · **Stack:** Next.js 16 · React 19 · TypeScript · Prisma · PostgreSQL
+**Stack:** Next.js 16 · React 19 · TypeScript · Prisma · PostgreSQL
 
 ---
 
